@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#070a12;}
+  input[type=range].rng{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;outline:none;cursor:pointer;}
+  input[type=range].rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #2f6bff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);}
+  input[type=range].rng::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #2f6bff;cursor:pointer;}
+  .vl-sticky{position:fixed;right:24px;bottom:24px;z-index:60;display:inline-flex;align-items:center;gap:9px;padding:15px 26px;border-radius:999px;background:#2f6bff;color:#fff;font-size:16px;font-weight:700;text-decoration:none;box-shadow:0 14px 36px rgba(47,107,255,.5);opacity:0;pointer-events:none;}
+  .vl-sticky[data-show="1"]{opacity:1;pointer-events:auto;}
+  html{scroll-behavior:smooth;}
+  @keyframes vlRise{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:none;}}
+  .vl-anim{animation:vlRise .75s cubic-bezier(.2,.7,.2,1) both;}
+  @keyframes vlToastIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+  @keyframes vlModalIn{from{opacity:0;transform:translateY(22px) scale(.97);}to{opacity:1;transform:none;}}
+  @keyframes vlBarIn{from{transform:translateY(100%);}to{transform:none;}}
+  @media (prefers-reduced-motion: reduce){ .vl-anim{animation:none;} html{scroll-behavior:auto;} }
+</style>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<script src="image-slot.js"></script>
+</helmet>
+<div style="background:#070a12;color:#e7ecf5;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;">
+
+  <!-- ===== Countdown banner ===== -->
+  <div data-screen-label="Banner" style="position:sticky;top:0;z-index:50;background:#2563eb;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:22px;padding:11px 20px;">
+    <div style="display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;color:#fff;">⏳ Special Offer Ends Soon!</div>
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <div style="text-align:center;"><div style="background:rgba(0,0,0,.18);border-radius:8px;min-width:46px;padding:5px 8px;font-size:19px;font-weight:700;color:#fff;">{{ days }}</div><div style="font-size:10px;letter-spacing:.1em;color:#dbe6ff;margin-top:3px;">DAYS</div></div>
+      <div style="text-align:center;"><div style="background:rgba(0,0,0,.18);border-radius:8px;min-width:46px;padding:5px 8px;font-size:19px;font-weight:700;color:#fff;">{{ hrs }}</div><div style="font-size:10px;letter-spacing:.1em;color:#dbe6ff;margin-top:3px;">HRS</div></div>
+      <div style="text-align:center;"><div style="background:rgba(0,0,0,.18);border-radius:8px;min-width:46px;padding:5px 8px;font-size:19px;font-weight:700;color:#fff;">{{ min }}</div><div style="font-size:10px;letter-spacing:.1em;color:#dbe6ff;margin-top:3px;">MIN</div></div>
+      <div style="text-align:center;"><div style="background:rgba(0,0,0,.18);border-radius:8px;min-width:46px;padding:5px 8px;font-size:19px;font-weight:700;color:#fff;">{{ sec }}</div><div style="font-size:10px;letter-spacing:.1em;color:#dbe6ff;margin-top:3px;">SEC</div></div>
+    </div>
+    <a href="#cta" style="background:#000;color:#fff;font-weight:700;font-size:15px;padding:11px 24px;border-radius:999px;text-decoration:none;">Claim Now</a>
+  </div>
+
+  <!-- ===== Sticky trial CTA (hides while the lead-magnet bar is up) ===== -->
+  <a href="#pricing" class="vl-sticky" data-show="{{ pillShow }}">Start Free Trial<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+
+  <!-- ===== Social-proof toast ===== -->
+  <sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:24px;bottom: {{ toastBottom }};z-index:65;display:flex;align-items:center;gap:13px;max-width:330px;background:#0d1426;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 16px 13px 14px;box-shadow:0 18px 44px rgba(0,0,0,.5);animation:vlToastIn .45s cubic-bezier(.2,.7,.2,1) both;">
+      <div style="flex:none;width:40px;height:40px;border-radius:50%;background:#1b2746;color:#7da0ff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ toast.initial }}</div>
+      <div style="min-width:0;">
+        <div style="font-size:14.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ toast.line1 }}</div>
+        <div style="font-size:13px;color:#8b97ad;display:flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex:none;"></span>{{ toast.line2 }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== Sticky lead-magnet email bar ===== -->
+  <sc-if value="{{ barVisible }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:70;background:linear-gradient(90deg,#15233f 0%,#0e1830 100%);border-top:1px solid rgba(47,107,255,.35);box-shadow:0 -12px 34px rgba(0,0,0,.45);padding:12px 56px 12px 20px;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;animation:vlBarIn .4s cubic-bezier(.2,.7,.2,1) both;">
+      <div style="display:flex;align-items:center;gap:11px;color:#fff;font-weight:700;font-size:16px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect x="3" y="8" width="18" height="13" rx="2"></rect><path d="M12 8v13M3 12h18M12 8C12 8 11 3 8 3 6.3 3 6 4.5 6 5c0 1.5 2 3 6 3zM12 8c0 0 1-5 4-5 1.7 0 2 1.5 2 2 0 1.5-2 3-6 3z"></path></svg>
+        <span>Free AI Agency Starter Kit: niche cheat-sheet, outreach scripts &amp; demo walkthrough.</span>
+      </div>
+      <form onSubmit="{{ submitKit }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="email" placeholder="Your email" value="{{ kitEmail }}" onChange="{{ setKitEmail }}" style="background:#0a1020;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:11px 18px;color:#fff;font-size:15px;font-family:inherit;outline:none;min-width:200px;" />
+        <button type="submit" style="display:inline-flex;align-items:center;gap:8px;background:#2f6bff;color:#fff;font-size:15px;font-weight:700;font-family:inherit;border:none;cursor:pointer;border-radius:999px;padding:11px 22px;white-space:nowrap;">Send it to me</button>
+      </form>
+      <button onClick="{{ dismissBar }}" aria-label="Dismiss" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.08);border:none;color:#cdd6e6;width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+  </sc-if>
+
+  <!-- ===== Exit-intent lead-magnet modal ===== -->
+  <sc-if value="{{ kitOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeKit }}" style="position:fixed;inset:0;z-index:100;background:rgba(4,7,14,.8);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div onClick="{{ stop }}" style="position:relative;max-width:560px;width:100%;background:linear-gradient(180deg,#101a32 0%,#0b1120 100%);border:1px solid rgba(47,107,255,.3);border-radius:24px;padding:44px 40px;box-shadow:0 50px 120px rgba(0,0,0,.65);animation:vlModalIn .42s cubic-bezier(.2,.7,.2,1) both;">
+        <button onClick="{{ closeKit }}" aria-label="Close" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:none;color:#cdd6e6;width:34px;height:34px;border-radius:50%;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+
+        <sc-if value="{{ kitNotSent }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:999px;background:rgba(47,107,255,.12);border:1px solid rgba(47,107,255,.3);color:#9bb6ff;font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:20px;">FREE DOWNLOAD</div>
+            <h3 style="font-size:32px;font-weight:800;letter-spacing:-.02em;color:#fff;margin:0 0 12px;line-height:1.1;">Before you go, grab the Free AI Agency Starter Kit.</h3>
+            <p style="font-size:16px;line-height:1.55;color:#9aa6bd;margin:0 0 24px;max-width:440px;">The exact niche cheat-sheet, outreach scripts, and demo walkthrough our members use to land their first paying client. Sent straight to your inbox.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;text-align:left;margin-bottom:28px;width:100%;max-width:460px;">
+              <sc-for list="{{ kitItems }}" as="k" hint-placeholder-count="4">
+                <div style="display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:#dbe3f2;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>{{ k }}</div>
+              </sc-for>
+            </div>
+            <form onSubmit="{{ submitKit }}" style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;">
+              <input type="email" placeholder="Enter your best email" value="{{ kitEmail }}" onChange="{{ setKitEmail }}" style="width:100%;background:#0a1020;border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:15px 18px;color:#fff;font-size:16px;font-family:inherit;outline:none;text-align:center;" />
+              <sc-if value="{{ kitErr }}" hint-placeholder-val="{{ false }}"><div style="color:#f0617a;font-size:14px;">{{ kitErr }}</div></sc-if>
+              <button type="submit" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#2f6bff;color:#fff;font-size:17px;font-weight:700;font-family:inherit;border:none;cursor:pointer;border-radius:12px;padding:16px;box-shadow:0 14px 36px rgba(47,107,255,.4);">Send Me the Free Kit <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+            </form>
+            <div style="font-size:13px;color:#6b7689;margin-top:14px;">No spam, ever. Unsubscribe in one click.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ kitSent }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 0;">
+            <div style="width:66px;height:66px;border-radius:50%;background:rgba(34,197,94,.13);display:flex;align-items:center;justify-content:center;margin-bottom:20px;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg></div>
+            <h3 style="font-size:30px;font-weight:800;letter-spacing:-.02em;color:#fff;margin:0 0 12px;">Your Starter Kit is on the way!</h3>
+            <p style="font-size:16px;line-height:1.55;color:#9aa6bd;margin:0 0 26px;max-width:420px;">Check <strong style="color:#fff;">{{ kitEmail }}</strong> in the next few minutes. While you wait, start your free trial and put the kit to work today.</p>
+            <button onClick="{{ startKitTrial }}" style="display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#2f6bff;color:#fff;font-size:17px;font-weight:700;font-family:inherit;border:none;cursor:pointer;border-radius:12px;padding:15px 32px;box-shadow:0 14px 36px rgba(47,107,255,.4);">Start My Free Trial <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== Brand bar ===== -->
+  <div data-screen-label="Brand" style="display:flex;align-items:center;justify-content:center;padding:26px 24px 6px;">
+    <a href="https://www.vibelabsagency.com" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none;">
+      <svg width="40" height="40" viewBox="0 0 64 64" style="flex:none;"><defs><linearGradient id="vlhdr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b73ff"/><stop offset="1" stop-color="#1d4fd6"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="url(#vlhdr)"/><g fill="#fff"><rect x="16" y="30" width="6" height="14" rx="3"/><rect x="26" y="22" width="6" height="22" rx="3"/><rect x="36" y="14" width="6" height="30" rx="3"/><rect x="46" y="26" width="6" height="18" rx="3"/></g></svg>
+      <span style="font-size:24px;font-weight:800;letter-spacing:-.02em;color:#fff;">Vibe<span style="color:#3b73ff;">Labs</span></span>
+    </a>
+  </div>
+
+  <!-- ===== Hero ===== -->
+  <section data-screen-label="Hero" style="padding:30px 24px 90px;text-align:center;background:radial-gradient(120% 80% at 50% 0%, #0f1830 0%, #070a12 60%);">
+    <div style="max-width:1080px;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:9px;padding:9px 18px;border-radius:999px;background:rgba(47,107,255,.10);border:1px solid rgba(47,107,255,.28);color:#9bb6ff;font-size:14px;font-weight:600;margin-bottom:30px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#6f97ff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"></path></svg>
+        No code. No tech team. The AI does the heavy lifting.
+      </div>
+      <h1 style="font-size:clamp(38px,7.4vw,74px);line-height:1.06;font-weight:800;letter-spacing:-.025em;margin:0;color:#fff;">Run an AI Agency for Local Businesses<br><span style="color:#3b73ff;">Without Writing a Line of Code.</span></h1>
+      <p style="max-width:800px;margin:26px auto 0;font-size:23px;line-height:1.5;color:#9aa6bd;">White-label one proven platform and follow a clear, step-by-step system. Let AI build the websites, chatbots, and automations, then turn it into simple monthly recurring revenue.</p>
+
+      <div style="margin:30px auto 0;max-width:860px;">
+        <div style="font-size:clamp(30px,5vw,52px);line-height:1.05;font-weight:800;letter-spacing:-.025em;background:linear-gradient(95deg,#9bc0ff 0%,#3b73ff 50%,#9bc0ff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#3b73ff;">Your Ultimate AI&nbsp;Agency-in-a-Box.</div>
+        <p style="max-width:680px;margin:16px auto 0;font-size:17px;line-height:1.55;color:#aab4c6;">The moment you join, your fully-built agency website goes live, complete with booking, CRM, automations, payments, and AI chat already wired in. Nothing to build. Just add your brand and start signing clients.</p>
+      </div>
+
+      <div style="position:relative;max-width:900px;margin:44px auto 0;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6);">
+        <img src="assets/hero-whitelabel.webp" alt="VibeLabs White-label SaaS: launch and sell your own software brand" style="display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;" />
+      </div>
+
+      <div style="margin-top:42px;">
+        <form onSubmit="{{ startTrial }}" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;max-width:620px;margin:0 auto;">
+          <input type="email" placeholder="Enter your email to start" value="{{ email }}" onChange="{{ setEmail }}" style="flex:1;min-width:240px;background:#0d1426;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:18px 24px;color:#fff;font-size:17px;font-family:inherit;outline:none;" />
+          <button type="submit" style="display:inline-flex;align-items:center;gap:11px;padding:18px 34px;border-radius:999px;background:#2f6bff;color:#fff;font-size:19px;font-weight:700;font-family:inherit;border:none;cursor:pointer;box-shadow:0 16px 40px rgba(47,107,255,.4);transition:transform .15s ease,box-shadow .15s ease;white-space:nowrap;" style-hover="transform:translateY(-2px);box-shadow:0 22px 54px rgba(47,107,255,.55);">
+            Start Free Trial
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </button>
+        </form>
+        <div style="margin-top:12px;color:#6b7689;font-size:14px;">No credit card required. Get instant access to your agency-in-a-box.</div>
+      </div>
+      <div style="margin-top:20px;display:flex;align-items:center;justify-content:center;gap:9px;color:#cdd6e6;font-size:15px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg>
+        Includes Free 1-on-1 Kickoff Call &amp; Live Bootcamp
+      </div>
+      <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:13px;color:#cdd6e6;font-size:15px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;">
+          <div style="width:30px;height:30px;border-radius:50%;background:#274174;border:2px solid #070a12;color:#aac3ff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">JM</div>
+          <div style="width:30px;height:30px;border-radius:50%;background:#2c3f6b;border:2px solid #070a12;color:#aac3ff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:-10px;">PR</div>
+          <div style="width:30px;height:30px;border-radius:50%;background:#243a66;border:2px solid #070a12;color:#aac3ff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:-10px;">MD</div>
+          <div style="width:30px;height:30px;border-radius:50%;background:#1d3056;border:2px solid #070a12;color:#aac3ff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:-10px;">+5k</div>
+        </div>
+        <span style="display:inline-flex;gap:2px;color:#fbbf24;font-size:16px;letter-spacing:1px;">★★★★★</span>
+        <span style="color:#cdd6e6;">Trusted by 5,000+ agency owners</span>
+      </div>
+      <div style="margin-top:8px;color:#6b7689;font-size:14px;">Plans from $297/mo after your free trial. Cancel anytime, no questions asked.</div>
+    </div>
+  </section>
+
+  <!-- ===== How you deliver value ===== -->
+  <section data-screen-label="Deliver value" style="padding:30px 24px 80px;">
+    <div style="max-width:1200px;margin:0 auto;background:#0a1020;border:1px solid rgba(255,255,255,.05);border-radius:28px;padding:70px 50px;">
+      <h2 style="text-align:center;font-size:48px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">How you deliver value instantly.</h2>
+      <p style="text-align:center;font-size:20px;color:#8b97ad;margin:16px auto 50px;">You own the software. The AI does the work. Your clients see results from day one.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;">
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:30px;position:relative;overflow:hidden;">
+          <svg style="position:absolute;right:18px;top:18px;opacity:.08;" width="92" height="92" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20"></path></svg>
+          <div style="width:46px;height:46px;border-radius:12px;background:rgba(47,107,255,.14);display:flex;align-items:center;justify-content:center;color:#6f97ff;margin-bottom:24px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.5 2.5 16 0 18M12 3c-2.5 2.5-2.5 16 0 18"></path></svg></div>
+          <h3 style="font-size:21px;font-weight:700;margin:0 0 10px;color:#fff;">AI built a website</h3>
+          <p style="font-size:16px;line-height:1.55;color:#8b97ad;margin:0;">No coding. Just typed 'plumber in Chicago' and it generated the layout, images, and copy.</p>
+        </div>
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:30px;position:relative;overflow:hidden;">
+          <svg style="position:absolute;right:18px;top:18px;opacity:.08;" width="92" height="92" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+          <div style="width:46px;height:46px;border-radius:12px;background:rgba(47,107,255,.14);display:flex;align-items:center;justify-content:center;color:#6f97ff;margin-bottom:24px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.4"></circle></svg></div>
+          <h3 style="font-size:21px;font-weight:700;margin:0 0 10px;color:#fff;">AI pulled business data</h3>
+          <p style="font-size:16px;line-height:1.55;color:#8b97ad;margin:0;">It automatically found their phone number, address, and reviews from Google Maps.</p>
+        </div>
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:30px;position:relative;overflow:hidden;">
+          <svg style="position:absolute;right:18px;top:18px;opacity:.08;" width="92" height="92" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"></path></svg>
+          <div style="width:46px;height:46px;border-radius:12px;background:rgba(47,107,255,.14);display:flex;align-items:center;justify-content:center;color:#6f97ff;margin-bottom:24px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"></path></svg></div>
+          <h3 style="font-size:21px;font-weight:700;margin:0 0 10px;color:#fff;">AI created a chatbot</h3>
+          <p style="font-size:16px;line-height:1.55;color:#8b97ad;margin:0;">Instantly trained an AI assistant to answer questions and book appointments for them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Beginner-friendly strategy ===== -->
+  <section data-screen-label="Client strategy" style="padding:70px 24px;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:64px;align-items:center;">
+      <div>
+        <h2 style="font-size:50px;line-height:1.08;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">The beginner-friendly client strategy.</h2>
+        <p style="font-size:19px;line-height:1.55;color:#8b97ad;margin:22px 0 38px;">You don't need a huge budget or sales experience. You just need to show local businesses what they're missing.</p>
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div style="display:flex;gap:18px;align-items:flex-start;"><div style="flex:none;width:34px;height:34px;border-radius:50%;background:rgba(47,107,255,.16);color:#6f97ff;font-weight:700;display:flex;align-items:center;justify-content:center;">1</div><p style="margin:3px 0 0;font-size:18px;line-height:1.5;color:#cdd6e6;">Search Google Maps for local businesses without a 'Website' button.</p></div>
+          <div style="display:flex;gap:18px;align-items:flex-start;"><div style="flex:none;width:34px;height:34px;border-radius:50%;background:rgba(47,107,255,.16);color:#6f97ff;font-weight:700;display:flex;align-items:center;justify-content:center;">2</div><p style="margin:3px 0 0;font-size:18px;line-height:1.5;color:#cdd6e6;">Reach out with a simple message: 'I noticed you don't have a site.'</p></div>
+          <div style="display:flex;gap:18px;align-items:flex-start;"><div style="flex:none;width:34px;height:34px;border-radius:50%;background:rgba(47,107,255,.16);color:#6f97ff;font-weight:700;display:flex;align-items:center;justify-content:center;">3</div><p style="margin:3px 0 0;font-size:18px;line-height:1.5;color:#cdd6e6;">Offer to show them a custom demo built specifically for them.</p></div>
+        </div>
+      </div>
+      <div style="background:#0d1426;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:24px;">
+        <div style="background:#1a2236;border-radius:10px;padding:14px 18px;color:#9aa6bd;font-size:15px;margin-bottom:18px;">Landscapers near me</div>
+        <div style="height:1px;background:rgba(255,255,255,.06);margin-bottom:6px;"></div>
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:18px 4px;border-bottom:1px solid rgba(255,255,255,.05);"><div><div style="font-weight:700;font-size:17px;color:#fff;margin-bottom:5px;">Atlanta Area Landscaping</div><div style="font-size:14px;color:#9aa6bd;margin-bottom:6px;">4.8 <span style="color:#fbbf24;">★★★★★</span> (24) · Landscaper</div><div style="font-size:14px;color:#f0617a;font-weight:600;">Missing Website</div></div><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.6" style="color:#56627a;"><circle cx="12" cy="12" r="9" stroke="#56627a"></circle><path d="M3 12h18M12 3c2.5 2.5 2.5 16 0 18M12 3c-2.5 2.5-2.5 16 0 18" stroke="#56627a"></path></svg></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:18px 4px;border-bottom:1px solid rgba(255,255,255,.05);"><div><div style="font-weight:700;font-size:17px;color:#fff;margin-bottom:5px;">Dallas Landscape Pro</div><div style="font-size:14px;color:#9aa6bd;margin-bottom:6px;">4.8 <span style="color:#fbbf24;">★★★★★</span> (24) · Landscaper</div><div style="font-size:14px;color:#f0617a;font-weight:600;">Missing Website</div></div><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.6" style="color:#56627a;"><circle cx="12" cy="12" r="9" stroke="#56627a"></circle><path d="M3 12h18M12 3c2.5 2.5 2.5 16 0 18M12 3c-2.5 2.5-2.5 16 0 18" stroke="#56627a"></path></svg></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:18px 4px;"><div><div style="font-weight:700;font-size:17px;color:#fff;margin-bottom:5px;">Phoenix Landscaping</div><div style="font-size:14px;color:#9aa6bd;margin-bottom:6px;">4.8 <span style="color:#fbbf24;">★★★★★</span> (24) · Landscaper</div><div style="font-size:14px;color:#f0617a;font-weight:600;">Missing Website</div></div><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.6" style="color:#56627a;"><circle cx="12" cy="12" r="9" stroke="#56627a"></circle><path d="M3 12h18M12 3c2.5 2.5 2.5 16 0 18M12 3c-2.5 2.5-2.5 16 0 18" stroke="#56627a"></path></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== No upfront costs ===== -->
+  <section data-screen-label="No upfront costs" style="padding:80px 24px;text-align:center;">
+    <div style="max-width:980px;margin:0 auto;">
+      <div style="width:54px;height:54px;border-radius:50%;background:#0f5132;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg></div>
+      <h2 style="font-size:50px;line-height:1.08;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">No upfront costs. No coding required.</h2>
+      <p style="font-size:21px;line-height:1.6;color:#9aa6bd;margin:26px auto 0;max-width:900px;">The biggest fear beginners have is wasting time and money building things no one buys. With this model, you use AI to generate a quick 60-second preview of their new system. <strong style="color:#fff;">You only set up their account after they agree to pay you.</strong> Zero risk. Zero wasted effort.</p>
+    </div>
+  </section>
+
+  <!-- ===== What the AI actually does ===== -->
+  <section data-screen-label="What AI does" style="padding:70px 24px;background:#0a1020;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);">
+    <div style="max-width:1200px;margin:0 auto;">
+      <h2 style="text-align:center;font-size:50px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">What the AI actually does.</h2>
+      <p style="text-align:center;font-size:20px;color:#8b97ad;margin:16px auto 52px;">Your new invisible team of experts.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px;">
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:28px;">
+          <div style="color:#6f97ff;margin-bottom:22px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.5 2.5 16 0 18M12 3c-2.5 2.5-2.5 16 0 18"></path></svg></div>
+          <h3 style="font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;">Builds Websites</h3>
+          <p style="font-size:15px;line-height:1.55;color:#8b97ad;margin:0;">Generates mobile-optimized, fast-loading sites with built-in SEO.</p>
+        </div>
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:28px;">
+          <div style="color:#6f97ff;margin-bottom:22px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="8" width="16" height="11" rx="2"></rect><path d="M12 8V4M9 4h6"></path><circle cx="9" cy="13" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="15" cy="13" r="1.1" fill="currentColor" stroke="none"></circle></svg></div>
+          <h3 style="font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;">Creates Chatbots</h3>
+          <p style="font-size:15px;line-height:1.55;color:#8b97ad;margin:0;">Trains an AI agent on the business's info to answer customer FAQs 24/7.</p>
+        </div>
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:28px;">
+          <div style="color:#6f97ff;margin-bottom:22px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"></path></svg></div>
+          <h3 style="font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;">Writes Content</h3>
+          <p style="font-size:15px;line-height:1.55;color:#8b97ad;margin:0;">Crafts persuasive copy for services, about pages, and email follow-ups.</p>
+        </div>
+        <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:28px;">
+          <div style="color:#6f97ff;margin-bottom:22px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg></div>
+          <h3 style="font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;">Automates Follow-up</h3>
+          <p style="font-size:15px;line-height:1.55;color:#8b97ad;margin:0;">Sets up automatic SMS and email replies so they never miss a lead.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Predictable income ===== -->
+  <section data-screen-label="Monthly income" style="padding:80px 24px;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:60px;align-items:center;">
+      <div style="background:#0d1426;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:24px;">
+        <div style="display:flex;justify-content:flex-start;margin-bottom:14px;"><div style="display:flex;gap:10px;align-items:flex-start;max-width:80%;"><div style="flex:none;width:34px;height:34px;border-radius:50%;background:#2f6bff;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">You</div><div style="background:#26345a;border-radius:12px;padding:13px 16px;font-size:15px;line-height:1.45;color:#dbe3f2;">Here's a quick preview of what a website could look like for your plumbing business.</div></div></div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px;"><div style="max-width:82%;text-align:right;"><div style="font-size:12px;color:#7b86a0;margin-bottom:4px;">Client</div><div style="background:#161d30;border-radius:12px;padding:13px 16px;font-size:15px;line-height:1.45;color:#dbe3f2;text-align:left;">Wow, that looks amazing. How much to keep this running and handle the chatbot?</div></div></div>
+        <div style="display:flex;justify-content:flex-start;"><div style="display:flex;gap:10px;align-items:flex-start;max-width:82%;"><div style="flex:none;width:34px;height:34px;border-radius:50%;background:#2f6bff;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">You</div><div style="background:#26345a;border-radius:12px;padding:13px 16px;font-size:15px;line-height:1.45;color:#dbe3f2;">It's just a simple monthly subscription. I handle all the tech, hosting, and AI updates.</div></div></div>
+      </div>
+      <div>
+        <h2 style="font-size:50px;line-height:1.08;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Build a predictable monthly income.</h2>
+        <p style="font-size:19px;color:#8b97ad;margin:20px 0 34px;">Why do local businesses happily pay you every month?</p>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div style="display:flex;gap:14px;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg><span style="font-size:18px;color:#cdd6e6;">They need leads and customers, but don't understand tech.</span></div>
+          <div style="display:flex;gap:14px;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg><span style="font-size:18px;color:#cdd6e6;">They want automation so they can focus on running their business.</span></div>
+          <div style="display:flex;gap:14px;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg><span style="font-size:18px;color:#cdd6e6;">They need a professional online presence to build trust.</span></div>
+          <div style="display:flex;gap:14px;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg><span style="font-size:18px;color:#cdd6e6;">They prefer paying someone for an 'all-in-one' solution.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Calculator ===== -->
+  <section data-screen-label="Calculator" style="padding:30px 24px 80px;">
+    <div style="max-width:1100px;margin:0 auto;background:#0c1322;border:1px solid rgba(255,255,255,.07);border-radius:28px;padding:60px 50px;text-align:center;">
+      <div style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:rgba(47,107,255,.10);border:1px solid rgba(47,107,255,.28);color:#9bb6ff;font-size:14px;font-weight:600;margin-bottom:22px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#6f97ff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"></path></svg> Do the math yourself</div>
+      <h2 style="font-size:52px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Calculate Your Potential</h2>
+      <p style="font-size:19px;color:#8b97ad;margin:14px 0 48px;">See how quickly a few local clients can replace your income.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:48px;align-items:center;text-align:left;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><span style="font-size:18px;font-weight:700;color:#fff;">Number of Clients</span><span style="font-size:22px;font-weight:800;color:#3b73ff;">{{ clients }}</span></div>
+          <input type="range" class="rng" min="1" max="50" step="1" value="{{ clients }}" onChange="{{ setClients }}" style="background: {{ clientsBg }};margin-bottom:42px;" />
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><span style="font-size:18px;font-weight:700;color:#fff;">Monthly Price per Client</span><span style="font-size:22px;font-weight:800;color:#3b73ff;">{{ priceLabel }}</span></div>
+          <input type="range" class="rng" min="50" max="1000" step="1" value="{{ price }}" onChange="{{ setPrice }}" style="background: {{ priceBg }};" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div style="background:linear-gradient(160deg,#10204a,#0c1626);border:1px solid rgba(47,107,255,.25);border-radius:18px;padding:34px;text-align:center;">
+            <div style="font-size:16px;color:#9aa6bd;margin-bottom:8px;">Your Monthly Recurring Revenue</div>
+            <div style="font-size:58px;font-weight:800;color:#3b73ff;line-height:1;">{{ monthly }}<span style="font-size:26px;color:#7c93c9;">/mo</span></div>
+          </div>
+          <div style="background:#0d1426;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:24px;text-align:center;">
+            <div style="font-size:15px;color:#9aa6bd;margin-bottom:6px;">Yearly Run Rate</div>
+            <div style="font-size:30px;font-weight:800;color:#fff;">{{ yearly }} /year</div>
+          </div>
+          <div style="display:flex;gap:11px;align-items:center;padding:14px 18px;background:rgba(47,107,255,.08);border:1px solid rgba(47,107,255,.2);border-radius:14px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg><span style="font-size:14px;line-height:1.45;color:#bcc8dd;">At {{ priceLabel }}/mo per client, just <strong style="color:#fff;">{{ clientsTo5k }} clients</strong> puts you past $5,000/mo.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== The exact process ===== -->
+  <section data-screen-label="The process" style="padding:60px 24px 90px;text-align:center;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <h2 style="font-size:50px;font-weight:800;letter-spacing:-.02em;margin:0 0 50px;color:#fff;">The exact process.</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px;">
+        <div style="position:relative;background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:40px 20px 28px;"><div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#2f6bff;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;">01</div><h3 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#fff;">Find Business</h3><p style="font-size:15px;color:#8b97ad;margin:0;">Locate them on Google Maps</p></div>
+        <div style="position:relative;background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:40px 20px 28px;"><div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#2f6bff;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;">02</div><h3 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#fff;">Use AI</h3><p style="font-size:15px;color:#8b97ad;margin:0;">Generate a quick preview demo</p></div>
+        <div style="position:relative;background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:40px 20px 28px;"><div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#2f6bff;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;">03</div><h3 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#fff;">Show Them</h3><p style="font-size:15px;color:#8b97ad;margin:0;">Send a simple message</p></div>
+        <div style="position:relative;background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:40px 20px 28px;"><div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;background:#2f6bff;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;">04</div><h3 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#fff;">Get Paid</h3><p style="font-size:15px;color:#8b97ad;margin:0;">Setup monthly recurring billing</p></div>
+      </div>
+      <div style="margin-top:48px;">
+        <a href="#cta" style="display:inline-flex;align-items:center;gap:11px;padding:18px 40px;border-radius:999px;background:#2f6bff;color:#fff;font-size:20px;font-weight:700;text-decoration:none;box-shadow:0 16px 40px rgba(47,107,255,.4);transition:transform .15s ease,box-shadow .15s ease;" style-hover="transform:translateY(-2px);box-shadow:0 22px 54px rgba(47,107,255,.55);">Start Your Free Trial Now <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;color:#9aa6bd;font-size:15px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg> Risk-Free 30-Day Trial. Cancel Anytime.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== White-label platform / comparison ===== -->
+  <section data-screen-label="White-label platform" style="padding:60px 24px 80px;text-align:center;background:#0a1020;border-top:1px solid rgba(255,255,255,.04);">
+    <div style="max-width:1080px;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:rgba(47,107,255,.10);border:1px solid rgba(47,107,255,.28);color:#9bb6ff;font-size:14px;font-weight:600;margin-bottom:22px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#6f97ff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"></path></svg> Replace $6,972/mo in software</div>
+      <h2 style="font-size:50px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">The ultimate white-label platform.</h2>
+      <p style="font-size:19px;line-height:1.55;color:#9aa6bd;margin:20px auto 0;max-width:840px;">Not only do you get to use this for your own business, but you can <strong style="color:#fff;">white-label the entire platform</strong> (put your own logo on it) and sell it as your own software to local clients. No development required.</p>
+
+    </div>
+  </section>
+
+  <!-- ===== Feature comparison table ===== -->
+  <section data-screen-label="Comparison table" style="padding:80px 24px;">
+    <div style="max-width:1080px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:46px;">
+        <h2 style="font-size:48px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">One login instead of a dozen invoices.</h2>
+        <p style="font-size:19px;color:#8b97ad;margin:14px auto 0;max-width:720px;">Here's what agencies normally stitch together and pay for separately, versus what's already built into your VibeLabs platform.</p>
+      </div>
+      <div style="background:#0c1322;border:1px solid rgba(255,255,255,.08);border-radius:22px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.45);">
+        <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;align-items:center;padding:20px 28px;background:#101a30;border-bottom:1px solid rgba(255,255,255,.08);">
+          <div style="font-size:13px;font-weight:700;letter-spacing:.08em;color:#7b86a0;text-transform:uppercase;">Capability</div>
+          <div style="text-align:center;font-size:13px;font-weight:700;letter-spacing:.04em;color:#9aa6bd;text-transform:uppercase;">Buying separately</div>
+          <div style="text-align:center;font-size:13px;font-weight:800;letter-spacing:.04em;color:#9bb6ff;text-transform:uppercase;">VibeLabs</div>
+        </div>
+        <sc-for list="{{ compareRows }}" as="r" hint-placeholder-count="12">
+          <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;align-items:center;padding:17px 28px;border-bottom:1px solid rgba(255,255,255,.05);">
+            <div style="font-size:16px;font-weight:600;color:#dbe3f2;">{{ r.feature }}</div>
+            <div style="text-align:center;font-size:15px;font-weight:600;color:#f0617a;">{{ r.price }}</div>
+            <div style="display:flex;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"></path></svg></div>
+          </div>
+        </sc-for>
+        <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;align-items:center;padding:24px 28px;background:#0f1830;">
+          <div style="font-size:18px;font-weight:800;color:#fff;">Total every month</div>
+          <div style="text-align:center;font-size:20px;font-weight:800;color:#f0617a;text-decoration:line-through;text-decoration-color:rgba(240,97,122,.6);">{{ compareTotal }}</div>
+          <div style="text-align:center;"><span style="display:inline-block;background:#2f6bff;color:#fff;font-size:17px;font-weight:800;padding:8px 18px;border-radius:999px;">$297/mo</span></div>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:14px;color:#6b7689;margin-top:22px;">Prices reflect typical standalone tool subscriptions. Your VibeLabs plan includes all of the above on one bill.</p>
+    </div>
+  </section>
+
+  <!-- ===== Integrations ===== -->
+  <section data-screen-label="Integrations" style="padding:30px 24px 80px;text-align:center;">
+    <div style="max-width:980px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:.18em;color:#7b86a0;font-weight:600;margin-bottom:14px;">CONNECTS WITH THE TOOLS YOU ALREADY USE</div>
+      <h2 style="font-size:40px;font-weight:800;letter-spacing:-.02em;margin:0 0 34px;color:#fff;">Plays nicely with your stack.</h2>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px;">
+        <sc-for list="{{ integrations }}" as="name" hint-placeholder-count="12">
+          <div style="display:flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;background:#0d1426;border:1px solid rgba(255,255,255,.08);font-size:16px;font-weight:600;color:#cdd6e6;">
+            <span style="width:9px;height:9px;border-radius:50%;background:#3b73ff;flex:none;"></span>{{ name }}
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-size:15px;color:#6b7689;margin-top:30px;">…and 1,000+ more through native Zapier and webhook connections.</p>
+    </div>
+  </section>
+
+  <!-- ===== What You Get ===== -->
+  <section data-screen-label="What you get" style="padding:80px 24px;text-align:center;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <h2 style="font-size:52px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Everything You Get When You Join</h2>
+      <p style="font-size:20px;color:#8b97ad;margin:16px auto 52px;">Everything you need to build, launch, and scale Your Ultimate AI Agency-in-a-Box.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px;text-align:left;">
+        <sc-for list="{{ perks }}" as="p" hint-placeholder-count="8">
+          <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:28px;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg>
+            <h3 style="font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;">{{ p.title }}</h3>
+            <p style="font-size:15px;line-height:1.55;color:#8b97ad;margin:0;">{{ p.text }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Two reassurance cards ===== -->
+  <section data-screen-label="Reassurance" style="padding:30px 24px 80px;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;">
+      <div style="background:linear-gradient(160deg,#0e1a36,#0b1120);border:1px solid rgba(47,107,255,.18);border-radius:22px;padding:42px;">
+        <h3 style="font-size:30px;font-weight:800;margin:0 0 30px;color:#fff;">Risk-Free, Zero-Pressure Start</h3>
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <sc-for list="{{ riskFree }}" as="i" hint-placeholder-count="4">
+            <div style="display:flex;gap:16px;align-items:flex-start;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="1.8" stroke-linejoin="round" style="flex:none;margin-top:2px;"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg><div><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px;">{{ i.title }}</div><div style="font-size:15px;line-height:1.5;color:#8b97ad;">{{ i.text }}</div></div></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:linear-gradient(160deg,#0e1a36,#0b1120);border:1px solid rgba(47,107,255,.18);border-radius:22px;padding:42px;">
+        <h3 style="font-size:30px;font-weight:800;margin:0 0 30px;color:#fff;">Get Started in Minutes (No Confusion)</h3>
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <sc-for list="{{ getStarted }}" as="i" hint-placeholder-count="4">
+            <div style="display:flex;gap:16px;align-items:flex-start;"><div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(34,197,94,.14);display:flex;align-items:center;justify-content:center;margin-top:1px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#22c55e"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg></div><div><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px;">{{ i.title }}</div><div style="font-size:15px;line-height:1.5;color:#8b97ad;">{{ i.text }}</div></div></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Founder ===== -->
+  <section data-screen-label="Founder" style="padding:70px 24px;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:60px;align-items:center;">
+      <div style="position:relative;">
+        <img src="assets/founder.jpg" alt="VibeLabs founder" style="display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:20px;" />
+        <div style="position:absolute;bottom:18px;right:18px;background:#0b1120;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px 24px;max-width:300px;box-shadow:0 16px 40px rgba(0,0,0,.5);"><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;">15+ Years in IT</div><div style="font-size:14px;line-height:1.45;color:#8b97ad;">Bridging complex technology and the people who use it.</div></div>
+      </div>
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:rgba(47,107,255,.10);border:1px solid rgba(47,107,255,.28);color:#9bb6ff;font-size:14px;font-weight:600;margin-bottom:22px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#6f97ff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"></path></svg> Meet the founder</div>
+        <h2 style="font-size:46px;font-weight:800;letter-spacing:-.02em;margin:0 0 22px;color:#fff;">Hey, I'm Cassey Cameron.</h2>
+        <p style="font-size:18px;line-height:1.6;color:#9aa6bd;margin:0 0 22px;">I spent over 15 years in IT, supporting businesses through technology implementations, solving real operational problems, and bridging the gap between complex systems and the people who depend on them. That work taught me one thing clearly: <strong style="color:#fff;">the gap between knowing a technology exists and knowing how to use it to build something real is enormous</strong> ,  and most people never cross it without a clear guide.</p>
+        <blockquote style="margin:0 0 22px;padding:4px 0 4px 20px;border-left:3px solid #3b73ff;"><p style="font-size:19px;line-height:1.5;color:#dbe3f2;font-style:italic;margin:0 0 8px;">“The information to build an AI business is everywhere. What most people are missing is a system that turns that knowledge into action.”</p><cite style="font-style:normal;font-size:14px;font-weight:700;color:#7da0ff;">,  Cassey, Founder</cite></blockquote>
+        <p style="font-size:18px;line-height:1.6;color:#9aa6bd;margin:0 0 34px;">When AI tools started accelerating, I saw the wave coming, a rare chance for ordinary people to build real businesses faster than ever. It was never a lack of knowledge holding people back; it was the lack of a clear system to follow. <strong style="color:#fff;">That's exactly what VibeLabs is</strong> ,  Done-For-You, Done-With-You, and full White-Label, so you can stop researching and actually start.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;"><div style="flex:none;color:#6f97ff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"></rect><path d="M16 10l6-3v10l-6-3z"></path></svg></div><div><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;">Free Live Bootcamp</div><div style="font-size:14px;color:#8b97ad;line-height:1.45;">To help get your business off the ground fast.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><div style="flex:none;color:#6f97ff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M22 16.9v2a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 1h2a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L7.1 8.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"></path></svg></div><div><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;">1-on-1 Kickoff Call</div><div style="font-size:14px;color:#8b97ad;line-height:1.45;">Personalized strategy session to start strong.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><div style="flex:none;color:#6f97ff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"></path><path d="M16 6a3 3 0 0 1 0 5M18 20c0-2.5-1-4-3-4.5"></path></svg></div><div><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;">Weekly Live Calls</div><div style="font-size:14px;color:#8b97ad;line-height:1.45;">Direct access to me every single week.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><div style="flex:none;color:#6f97ff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4z"></path><path d="M20 4h-7a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20z"></path></svg></div><div><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;">All Courses &amp; Scripts</div><div style="font-size:14px;color:#8b97ad;line-height:1.45;">My exact templates and scripts for free.</div></div></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;"><div style="flex:none;color:#6f97ff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"></path></svg></div><div><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;">Private Community</div><div style="font-size:14px;color:#8b97ad;line-height:1.45;">Get answers from me and top performers.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Testimonials ===== -->
+  <section data-screen-label="Testimonials" style="padding:70px 24px;background:#0a1020;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);">
+    <div style="max-width:1200px;margin:0 auto;">
+      <h2 style="text-align:center;font-size:52px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Real people. Real results.</h2>
+      <p style="text-align:center;font-size:19px;color:#8b97ad;margin:16px auto 50px;">A few of the early members building with VibeLabs.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;">
+        <sc-for list="{{ testimonials }}" as="t" hint-placeholder-count="9">
+          <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:30px;display:flex;flex-direction:column;">
+            <div style="font-family:Georgia,serif;font-size:54px;line-height:.4;color:#2f6bff;height:30px;">&ldquo;</div>
+            <p style="font-size:16px;line-height:1.55;color:#c3ccdc;font-style:italic;margin:10px 0 24px;flex:1;">"{{ t.quote }}"</p>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="flex:none;width:40px;height:40px;border-radius:50%;background:#1b2746;color:#7da0ff;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ t.initial }}</div>
+              <div><div style="font-size:15px;font-weight:700;color:#fff;">{{ t.role }}</div><div style="color:#fbbf24;font-size:13px;letter-spacing:1px;">★★★★★</div></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <p style="text-align:center;font-size:14px;color:#6b7689;margin-top:34px;">* Results will vary. Many people use this to start their journey.</p>
+    </div>
+  </section>
+
+  <!-- ===== Video testimonials ===== -->
+  <section data-screen-label="Video testimonials" style="padding:70px 24px;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <h2 style="text-align:center;font-size:48px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Hear it in their own words.</h2>
+      <p style="text-align:center;font-size:19px;color:#8b97ad;margin:16px auto 48px;">Short walkthroughs from members who started exactly where you are.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;">
+        <sc-for list="{{ videos }}" as="v" hint-placeholder-count="3">
+          <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;overflow:hidden;">
+            <div style="position:relative;aspect-ratio:16/10;background:repeating-linear-gradient(135deg,#111a30,#111a30 12px,#0e1628 12px,#0e1628 24px);display:flex;align-items:center;justify-content:center;">
+              <div style="width:62px;height:62px;border-radius:50%;background:rgba(47,107,255,.92);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(47,107,255,.5);"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"></path></svg></div>
+              <div style="position:absolute;left:14px;top:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.04em;color:#5b6a86;">testimonial clip</div>
+              <div style="position:absolute;right:12px;bottom:12px;background:rgba(0,0,0,.6);color:#fff;font-size:13px;font-weight:600;padding:3px 9px;border-radius:6px;">{{ v.length }}</div>
+            </div>
+            <div style="padding:22px 24px;">
+              <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px;">{{ v.name }}</div>
+              <div style="font-size:15px;line-height:1.45;color:#8b97ad;">{{ v.role }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Results / case studies ===== -->
+  <section data-screen-label="Results" style="padding:70px 24px;background:#0a1020;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px;margin-bottom:64px;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+          <div style="background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:32px 26px;text-align:center;">
+            <div style="font-size:42px;font-weight:800;letter-spacing:-.02em;color:#3b73ff;line-height:1;margin-bottom:12px;">{{ s.value }}</div>
+            <div style="font-size:15px;line-height:1.5;color:#8b97ad;">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <h2 style="text-align:center;font-size:48px;font-weight:800;letter-spacing:-.02em;margin:0 0 12px;color:#fff;">From first demo to recurring revenue.</h2>
+      <p style="text-align:center;font-size:19px;color:#8b97ad;margin:0 auto 48px;">Three members, three niches, the same simple system.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;">
+        <sc-for list="{{ caseStudies }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;background:#0d1426;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:32px;">
+            <div style="display:flex;align-items:center;gap:13px;margin-bottom:24px;">
+              <div style="flex:none;width:46px;height:46px;border-radius:50%;background:#1b2746;color:#7da0ff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ c.initial }}</div>
+              <div><div style="font-size:17px;font-weight:700;color:#fff;">{{ c.name }}</div><div style="font-size:13px;color:#8b97ad;">{{ c.niche }}</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:10px;padding:18px 20px;background:#0f1830;border-radius:14px;margin-bottom:20px;">
+              <div style="font-size:34px;font-weight:800;color:#3b73ff;line-height:1;">{{ c.metric }}</div>
+              <div style="padding-bottom:3px;"><div style="font-size:14px;font-weight:600;color:#cdd6e6;">{{ c.metricLabel }}</div><div style="font-size:13px;color:#7b86a0;">{{ c.sub }}</div></div>
+            </div>
+            <p style="font-size:15px;line-height:1.6;color:#9aa6bd;margin:0;flex:1;">{{ c.story }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <p style="text-align:center;font-size:14px;color:#6b7689;margin-top:34px;">* Results are individual experiences and are not typical. Your outcome depends on the work you put in.</p>
+    </div>
+  </section>
+
+  <!-- ===== Awards ===== -->
+  <section data-screen-label="Awards" style="padding:60px 24px;text-align:center;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:.18em;color:#7b86a0;font-weight:600;margin-bottom:34px;">POWERED BY AN AWARD-WINNING PLATFORM</div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:54px;color:#cdd6e6;font-size:20px;font-weight:700;">
+        <div style="display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h12v4a6 6 0 0 1-12 0z"></path><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 21h6M12 13v8"></path></svg> Inc. 5000</div>
+        <div style="display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="9" r="5"></circle><path d="M9 13l-2 8 5-3 5 3-2-8"></path></svg> G2 Leader 2024</div>
+        <div style="display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#6f97ff"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.8 20.9l1.6-6.8L2.2 8.9l6.9-.6z"></path></svg> Capterra Shortlist</div>
+        <div style="display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg> TrustRadius Top Rated</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Pricing ===== -->
+  <section id="pricing" data-screen-label="Pricing" style="scroll-margin-top:72px;padding:80px 24px;background:#0a1020;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);">
+    <div style="max-width:1180px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:54px;">
+        <div style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:rgba(47,107,255,.10);border:1px solid rgba(47,107,255,.28);color:#9bb6ff;font-size:14px;font-weight:600;margin-bottom:22px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#6f97ff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"></path></svg> One platform. Pick how much help you want.</div>
+        <h2 style="font-size:52px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Simple pricing. Start free for 30 days.</h2>
+        <p style="font-size:19px;color:#8b97ad;margin:16px auto 0;max-width:720px;">Every plan includes the full white-label platform, the step-by-step system, and the community. The difference is how much we do with you.</p>
+      </div>
+      <div style="display:flex;justify-content:center;margin-bottom:40px;">
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:5px;border-radius:999px;background:#0d1426;border:1px solid rgba(255,255,255,.08);">
+          <button type="button" onClick="{{ setMonthly }}" style="{{ monthlyBtnStyle }}">Monthly</button>
+          <button type="button" onClick="{{ setAnnual }}" style="{{ annualBtnStyle }}">Annual <span style="font-size:12px;opacity:.85;">· save 17%</span></button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;align-items:stretch;">
+
+        <div style="display:flex;flex-direction:column;background:#0d1426;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:38px 32px;">
+          <div style="font-size:14px;font-weight:700;letter-spacing:.04em;color:#7da0ff;text-transform:uppercase;margin-bottom:8px;">Done-With-You</div>
+          <div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:14px;">Builder</div>
+          <div style="display:flex;align-items:flex-end;gap:6px;margin-bottom:6px;"><span style="font-size:48px;font-weight:800;color:#fff;line-height:1;">{{ builderPrice }}</span><span style="font-size:17px;color:#8b97ad;margin-bottom:6px;">/mo</span></div>
+          <div style="font-size:13px;color:#6b7689;margin-bottom:14px;">{{ billingNote }}</div>
+          <div style="font-size:14px;color:#8b97ad;margin-bottom:26px;">For the self-starter ready to run the system.</div>
+          <div style="display:flex;flex-direction:column;gap:13px;margin-bottom:30px;">
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Full white-label platform &amp; AI tools</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>The complete step-by-step system</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Weekly live calls &amp; private community</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>All courses, scripts &amp; templates</div>
+          </div>
+          <a href="#cta" style="margin-top:auto;text-align:center;padding:15px;border-radius:999px;border:1px solid rgba(47,107,255,.5);color:#fff;font-weight:700;font-size:16px;text-decoration:none;">Start Free Trial</a>
+        </div>
+
+        <div style="display:flex;flex-direction:column;background:linear-gradient(170deg,#13224a,#0c1426);border:1.5px solid #2f6bff;border-radius:20px;padding:38px 32px;position:relative;box-shadow:0 24px 60px rgba(47,107,255,.22);">
+          <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#2f6bff;color:#fff;font-size:12px;font-weight:700;letter-spacing:.05em;padding:6px 16px;border-radius:999px;">MOST POPULAR</div>
+          <div style="font-size:14px;font-weight:700;letter-spacing:.04em;color:#9bb6ff;text-transform:uppercase;margin-bottom:8px;">Done-For-You</div>
+          <div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:14px;">Agency</div>
+          <div style="display:flex;align-items:flex-end;gap:6px;margin-bottom:6px;"><span style="font-size:48px;font-weight:800;color:#fff;line-height:1;">{{ agencyPrice }}</span><span style="font-size:17px;color:#a9c1ff;margin-bottom:6px;">/mo</span></div>
+          <div style="font-size:13px;color:#7c93c9;margin-bottom:14px;">{{ billingNote }}</div>
+          <div style="font-size:14px;color:#a9c1ff;margin-bottom:26px;">We set it up with you, so you launch faster.</div>
+          <div style="display:flex;flex-direction:column;gap:13px;margin-bottom:30px;">
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#eaf0ff;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Everything in Builder</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#eaf0ff;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Done-for-you account &amp; funnel setup</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#eaf0ff;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>1-on-1 kickoff call &amp; priority support</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#eaf0ff;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Covered by the First-Client Guarantee</div>
+          </div>
+          <a href="#cta" style="margin-top:auto;text-align:center;padding:15px;border-radius:999px;background:#2f6bff;color:#fff;font-weight:700;font-size:16px;text-decoration:none;box-shadow:0 12px 30px rgba(47,107,255,.4);">Start Free Trial</a>
+        </div>
+
+        <div style="display:flex;flex-direction:column;background:#0d1426;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:38px 32px;">
+          <div style="font-size:14px;font-weight:700;letter-spacing:.04em;color:#7da0ff;text-transform:uppercase;margin-bottom:8px;">Your Own Brand</div>
+          <div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:14px;">White-Label</div>
+          <div style="display:flex;align-items:flex-end;gap:6px;margin-bottom:6px;"><span style="font-size:48px;font-weight:800;color:#fff;line-height:1;">{{ wlPrice }}</span><span style="font-size:17px;color:#8b97ad;margin-bottom:6px;">/mo</span></div>
+          <div style="font-size:13px;color:#6b7689;margin-bottom:14px;">{{ billingNote }}</div>
+          <div style="font-size:14px;color:#8b97ad;margin-bottom:26px;">Sell the whole platform as your own software.</div>
+          <div style="display:flex;flex-direction:column;gap:13px;margin-bottom:30px;">
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Everything in Agency</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Your logo, domain &amp; brand on everything</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>White-label mobile app (add-on)</div>
+            <div style="display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#cdd6e6;line-height:1.4;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M5 13l4 4L19 7"></path></svg>Keep 100% of what you charge clients</div>
+          </div>
+          <a href="#cta" style="margin-top:auto;text-align:center;padding:15px;border-radius:999px;border:1px solid rgba(47,107,255,.5);color:#fff;font-weight:700;font-size:16px;text-decoration:none;">Start Free Trial</a>
+        </div>
+
+      </div>
+      <div style="text-align:center;margin-top:30px;color:#6b7689;font-size:14px;">No card required to start · Cancel anytime · Replaces $6,972/mo in separate tools</div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section data-screen-label="FAQ" style="padding:70px 24px;">
+    <div style="max-width:880px;margin:0 auto;">
+      <h2 style="text-align:center;font-size:48px;font-weight:800;letter-spacing:-.02em;margin:0 0 44px;color:#fff;">Still skeptical? Let's address that.</h2>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+          <div style="background:#0d1426;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:24px 26px;cursor:pointer;" onClick="{{ f.toggle }}">
+            <div style="display:flex;align-items:center;gap:14px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b73ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M9 6l6 6-6 6"></path></svg><span style="font-size:19px;font-weight:700;color:#fff;">{{ f.q }}</span></div>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ true }}"><p style="font-size:16px;line-height:1.6;color:#9aa6bd;margin:14px 0 0;padding-left:32px;">{{ f.a }}</p></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Final CTA ===== -->
+  <section id="cta" data-screen-label="Final CTA" style="scroll-margin-top:72px;padding:90px 24px 100px;text-align:center;background:radial-gradient(120% 90% at 50% 100%, #0f1830 0%, #070a12 60%);">
+    <div style="max-width:900px;margin:0 auto;">
+      <h2 style="font-size:clamp(34px,6vw,58px);font-weight:800;letter-spacing:-.025em;margin:0;color:#fff;">The hard part was always starting.<br><span style="color:#3b73ff;">We removed it.</span></h2>
+      <p style="font-size:20px;line-height:1.6;color:#9aa6bd;margin:24px auto 34px;max-width:780px;">The barrier to entry has never been lower. You don't need to spend months learning to code or design. The AI is ready to do the heavy lifting. You just need a system, and we'll hand you ours.</p>
+      <div style="max-width:680px;margin:0 auto 38px;background:linear-gradient(160deg,#0e1a36,#0b1120);border:1px solid rgba(47,107,255,.25);border-radius:18px;padding:30px 34px;display:flex;gap:20px;align-items:center;text-align:left;">
+        <div style="flex:none;width:58px;height:58px;border-radius:50%;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg></div>
+        <div><div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:5px;">The VibeLabs First-Client Guarantee</div><div style="font-size:15px;line-height:1.55;color:#9aa6bd;">Use your free trial, join the kickoff call, and follow the system. If you do the work and still can't get your first client demo live, we'll work with you 1-on-1 until you do ,  or you pay nothing.</div></div>
+      </div>
+      <a href="#contact" style="display:inline-flex;align-items:center;gap:11px;padding:19px 44px;border-radius:999px;background:#2f6bff;color:#fff;font-size:21px;font-weight:700;text-decoration:none;box-shadow:0 16px 44px rgba(47,107,255,.45);transition:transform .15s ease,box-shadow .15s ease;" style-hover="transform:translateY(-2px);box-shadow:0 22px 58px rgba(47,107,255,.6);">Start Your 30-Day Free Trial <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      <div style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:9px;color:#cdd6e6;font-size:15px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path></svg> Free 1-on-1 Kickoff Call &amp; Live Bootcamp included · Plans from $297/mo after trial</div>
+    </div>
+  </section>
+
+  <!-- ===== Contact ===== -->
+  <section id="contact" data-screen-label="Contact" style="scroll-margin-top:72px;padding:80px 24px;border-top:1px solid rgba(255,255,255,.04);">
+    <div style="max-width:680px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:38px;">
+        <h2 style="font-size:44px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;">Still have questions?</h2>
+        <p style="font-size:18px;color:#8b97ad;margin:14px auto 0;">Tell us where you're at and the VibeLabs team will point you in the right direction.</p>
+      </div>
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div style="background:linear-gradient(160deg,#0e1a36,#0b1120);border:1px solid rgba(47,107,255,.25);border-radius:18px;padding:44px 34px;text-align:center;">
+          <div style="width:58px;height:58px;border-radius:50%;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"></path></svg></div>
+          <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;">Your message is on its way.</div>
+          <div style="font-size:16px;color:#9aa6bd;line-height:1.55;">Your email app just opened with everything filled in. Hit send and we'll reply to <strong style="color:#fff;">{{ email }}</strong> within one business day.</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submit }}" style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+            <input type="text" placeholder="Your name" value="{{ name }}" onChange="{{ setName }}" style="width:100%;background:#0d1426;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px 16px;color:#fff;font-size:16px;font-family:inherit;outline:none;" />
+            <input type="email" placeholder="Email address" value="{{ email }}" onChange="{{ setEmail }}" style="width:100%;background:#0d1426;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px 16px;color:#fff;font-size:16px;font-family:inherit;outline:none;" />
+          </div>
+          <textarea placeholder="What would you like to know?" value="{{ message }}" onChange="{{ setMessage }}" rows="5" style="width:100%;background:#0d1426;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px 16px;color:#fff;font-size:16px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+          <sc-if value="{{ error }}" hint-placeholder-val="{{ false }}">
+            <div style="color:#f0617a;font-size:14px;">{{ error }}</div>
+          </sc-if>
+          <button type="submit" style="align-self:flex-start;display:inline-flex;align-items:center;gap:10px;background:#2f6bff;color:#fff;font-size:17px;font-weight:700;font-family:inherit;border:none;cursor:pointer;padding:16px 34px;border-radius:999px;box-shadow:0 12px 30px rgba(47,107,255,.35);">Send message<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"></path></svg></button>
+          <div style="font-size:13.5px;color:#6b7689;">Prefer email? Reach us directly at <a href="mailto:hello@vibelabsagency.com" style="color:#7da0ff;text-decoration:none;">hello@vibelabsagency.com</a>.</div>
+        </form>
+      </sc-if>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer data-screen-label="Footer" style="padding:60px 24px 50px;border-top:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(47,107,255,.18);background:#05070d;">
+    <div style="max-width:1200px;margin:0 auto;color:#6b7689;font-size:13.5px;line-height:1.6;">
+      <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:space-between;align-items:flex-start;padding-bottom:34px;margin-bottom:34px;border-bottom:1px solid rgba(255,255,255,.06);">
+        <div style="max-width:440px;">
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px;">
+            <svg width="34" height="34" viewBox="0 0 64 64" style="flex:none;"><defs><linearGradient id="vlftr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b73ff"/><stop offset="1" stop-color="#1d4fd6"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="url(#vlftr)"/><g fill="#fff"><rect x="16" y="30" width="6" height="14" rx="3"/><rect x="26" y="22" width="6" height="22" rx="3"/><rect x="36" y="14" width="6" height="30" rx="3"/><rect x="46" y="26" width="6" height="18" rx="3"/></g></svg>
+            <span style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;">Vibe<span style="color:#3b73ff;">Labs</span></span>
+          </div>
+          <div style="font-size:16px;font-weight:600;color:#9aa6bd;margin-bottom:12px;">Turn AI knowledge into action.</div>
+          <p style="margin:0;font-size:14px;line-height:1.6;color:#6b7689;">VibeLabs gives beginners a proven white-label platform and a step-by-step system to launch a profitable AI agency for local businesses, whether done-for-you, done-with-you, or fully your own brand.</p>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-weight:700;color:#9aa6bd;margin-bottom:10px;">Get in touch</div>
+          <a href="https://www.vibelabsagency.com" style="display:block;color:#8b97ad;text-decoration:none;margin-bottom:7px;">www.vibelabsagency.com</a>
+          <a href="#contact" style="display:block;color:#8b97ad;text-decoration:none;">hello@vibelabsagency.com</a>
+        </div>
+      </div>
+      <div style="margin-bottom:26px;"><div style="font-weight:700;color:#9aa6bd;margin-bottom:6px;">Independent Disclosure</div><p style="margin:0;">VibeLabs Agency LLC is an independent company and is not affiliated with, endorsed by, or an agent of HighLevel. We do not have the authority to make commitments or representations on behalf of HighLevel. We may receive referral commissions for recommending their products or services. All opinions shared are our own and should not be interpreted as official statements from HighLevel Inc. or its affiliates.</p></div>
+      <div style="margin-bottom:26px;"><div style="font-weight:700;color:#9aa6bd;margin-bottom:6px;">Earnings Disclaimer</div><p style="margin:0 0 10px;">Any results shared on this page reflect personal experiences and those of our clients. These results are not typical, and we do not guarantee that you will achieve similar outcomes.</p><p style="margin:0 0 10px;">Success in any business depends on many factors, including your background, experience, work ethic, and level of commitment. Most people who purchase training programs do not implement fully or achieve significant results.</p><p style="margin:0;">All businesses involve risk and require consistent effort. By purchasing or participating, you acknowledge and accept these risks.</p></div>
+      <div style="margin-bottom:26px;"><div style="font-weight:700;color:#9aa6bd;margin-bottom:6px;">Communication Consent</div><p style="margin:0;">By submitting your contact information on this website, you agree to receive communication from VibeLabs Agency LLC via email, phone, and text message. These communications may include updates, educational content, and promotional offers. You may opt out at any time.</p></div>
+      <div style="margin-bottom:34px;"><div style="font-weight:700;color:#9aa6bd;margin-bottom:6px;">Business Opportunity Statement</div><p style="margin:0 0 10px;">VibeLabs Agency LLC and its associated trainings are not intended to be a "business opportunity" as defined under the Business Opportunity Rule (§ 437.1m). We do not provide customers, accounts, or guaranteed income systems.</p><p style="margin:0;">We provide training, tools, and educational resources designed to help you build your own business. For transparency, we make additional disclosure information available upon request.</p></div>
+      <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:24px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;">
+        <div>© 2026 VibeLabs Agency LLC · www.vibelabsagency.com · All rights reserved.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:26px;"><a href="privacy.html" style="color:#8b97ad;text-decoration:none;">Privacy Policy</a><a href="terms.html" style="color:#8b97ad;text-decoration:none;">Terms &amp; Conditions</a><a href="earnings.html" style="color:#8b97ad;text-decoration:none;">Earnings Disclaimer</a></div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+  <!-- ===== Ava AI concierge (floating launcher + chat, captures & books leads) ===== -->
+  <dc-import name="vibemate" hint-size="0,0"></dc-import></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { clients: 10, price: 297, days:'01', hrs:'01', min:'58', sec:'34', openFaq: 0,
+            showSticky: false, billing:'monthly', name:'', email:'', message:'', error:'', sent:false,
+            kitOpen:false, kitDismissed:false, kitSent:false, kitEmail:'', kitErr:'',
+            barDismissed:false, toast:null };
+
+  kitItems = ['Niche selector cheat-sheet', 'Proven cold-outreach scripts', 'AI demo build walkthrough', 'Pricing & profit calculator'];
+  toastList = [
+    { initial:'J', line1:'Jordan from Tampa, FL', line2:'just started a free trial · 2 min ago' },
+    { initial:'P', line1:'Priya from Austin, TX', line2:'downloaded the Starter Kit · 5 min ago' },
+    { initial:'M', line1:'Marcus from Columbus, OH', line2:'landed his first client · 11 min ago' },
+    { initial:'A', line1:'Alana from Phoenix, AZ', line2:'started a free trial · 18 min ago' },
+    { initial:'D', line1:'Devin from Denver, CO', line2:'grabbed the Starter Kit · 24 min ago' },
+    { initial:'S', line1:'Sofia from Miami, FL', line2:'upgraded to white-label · 33 min ago' },
+  ];
+
+  componentDidMount() {
+    this.target = Date.now() + ((1*86400 + 1*3600 + 58*60 + 34) * 1000);
+    this.timer = setInterval(() => this.tick(), 1000);
+    this.onScroll = () => {
+      const show = window.scrollY > 700;
+      if (show !== this.state.showSticky) this.setState({ showSticky: show });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onScroll();
+    this.setupReveal();
+
+    // Exit-intent: open the lead-magnet once per session when the cursor leaves the top.
+    this.onLeave = (e) => {
+      if (e.clientY <= 0 && !this.state.kitSent && !this.state.kitDismissed
+          && !this.state.kitOpen && !sessionStorage.getItem('vl_kit_seen')) {
+        sessionStorage.setItem('vl_kit_seen', '1');
+        this.setState({ kitOpen: true });
+      }
+    };
+    document.addEventListener('mouseleave', this.onLeave);
+
+    // Social-proof toasts: gentle rotation.
+    this.toastI = 0;
+    this._toastT1 = setTimeout(() => this.cycleToast(), 5000);
+    this.toastTimer = setInterval(() => this.cycleToast(), 12000);
+  }
+  cycleToast() {
+    const t = this.toastList[this.toastI % this.toastList.length];
+    this.toastI++;
+    this.setState({ toast: t });
+    clearTimeout(this._toastHide);
+    this._toastHide = setTimeout(() => this.setState({ toast: null }), 6500);
+  }
+  submitKit(e) {
+    e.preventDefault();
+    const email = (this.state.kitEmail || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.setState({ kitErr: 'Please enter a valid email so we can send the kit.' });
+      return;
+    }
+    this.setState({ kitErr:'', kitSent:true, kitOpen:true, barDismissed:true,
+                    email: this.state.email || email });
+  }
+  setupReveal() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) { en.target.classList.add('vl-anim'); this.io.unobserve(en.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+    // Animate sections below the fold; leave the banner, brand bar, and hero static.
+    const secs = Array.from(document.querySelectorAll('[data-screen-label]')).slice(3);
+    secs.forEach(el => this.io.observe(el));
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+    window.removeEventListener('scroll', this.onScroll);
+    if (this.io) this.io.disconnect();
+    clearInterval(this.toastTimer);
+    clearTimeout(this._toastHide);
+    clearTimeout(this._toastT1);
+    document.removeEventListener('mouseleave', this.onLeave);
+  }
+
+  submitContact(e) {
+    e.preventDefault();
+    const name = this.state.name.trim();
+    const email = this.state.email.trim();
+    const message = this.state.message.trim();
+    if (!name || !email || !message) {
+      this.setState({ error: 'Please fill in your name, email, and a short message.' });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.setState({ error: 'That email address doesn\u2019t look right \u2014 mind double-checking?' });
+      return;
+    }
+    const subject = encodeURIComponent('VibeLabs enquiry from ' + name);
+    const body = encodeURIComponent(message + '\n\nFrom ' + name + ' (' + email + ')');
+    window.location.href = 'mailto:hello@vibelabsagency.com?subject=' + subject + '&body=' + body;
+    this.setState({ error: '', sent: true });
+  }
+  tick() {
+    let s = Math.max(0, Math.floor((this.target - Date.now()) / 1000));
+    const d = Math.floor(s/86400); s -= d*86400;
+    const h = Math.floor(s/3600); s -= h*3600;
+    const m = Math.floor(s/60); s -= m*60;
+    const p = n => String(n).padStart(2,'0');
+    this.setState({ days:p(d), hrs:p(h), min:p(m), sec:p(s) });
+  }
+
+  renderVals() {
+    const clients = this.state.clients, price = this.state.price;
+    const monthly = clients * price;
+    const fmt = n => '$' + n.toLocaleString('en-US');
+    const clientsTo5k = Math.ceil(5000 / price);
+
+    const isAnnual = this.state.billing === 'annual';
+    const planPrice = b => isAnnual ? Math.round(b * 10 / 12) : b;
+    const tBase = { padding:'10px 24px', borderRadius:'999px', border:'none', cursor:'pointer', fontSize:'15px', fontWeight:700, fontFamily:'inherit', transition:'all .15s' };
+    const tOn = { background:'#2f6bff', color:'#fff' };
+    const tOff = { background:'transparent', color:'#9aa6bd' };
+    const cPct = ((clients - 1) / 49) * 100;
+    const pPct = ((price - 50) / 950) * 100;
+    const bar = pct => `linear-gradient(90deg,#2f6bff ${pct}%,#1b2540 ${pct}%)`;
+    const barVisible = false; // retired: the Ava concierge launcher now owns the persistent floating CTA
+
+    const perks = [
+      { title:'Launch Faster', text:'Get step-by-step training that shows you exactly how to start, grow, and scale a profitable online business.' },
+      { title:'Proven Blueprint', text:'Access the same strategies, funnels, and systems used to generate millions in affiliate commissions.' },
+      { title:'Weekly Live Coaching', text:'Join live coaching calls where you can ask questions, get feedback, and build a real long-term game plan.' },
+      { title:'1-on-1 Setup', text:'Start with a personal kickoff call to get everything set up the right way, plus ongoing access to expert support.' },
+      { title:'Done-For-You Setup', text:'Have your account, tools, and systems set up for you, so you can focus on getting results, not figuring out software.' },
+      { title:'Plug-and-Play Funnels', text:'Use the exact funnels, websites, and templates that are already proven to convert, just customize and launch.' },
+      { title:'Real Business Models', text:'Learn multiple ways to monetize, including agency services, affiliate marketing, and niche-specific strategies.' },
+      { title:'All-In-One Software', text:'Get access to the full platform with everything you need, funnels, automation, payments, CRM, and more.' },
+    ];
+
+    const riskFree = [
+      { title:'Try Everything Free for 30 Days', text:'Get full access to the entire system, tools, and training, completely risk-free.' },
+      { title:'Start Without Any Upfront Investment', text:"There's nothing to pay today. You can explore, learn, and build your business without putting money on the line." },
+      { title:'Launch Before You Ever Spend a Dollar', text:'Set everything up, start attracting clients, and even begin generating revenue, all during your free trial.' },
+      { title:'No Pressure, Cancel Anytime', text:"If it's not the right fit, simply cancel within 30 days. No risk, no commitment." },
+    ];
+
+    const getStarted = [
+      { title:'Step-by-Step, Simple Onboarding', text:'Just follow a quick, guided process to get everything up and running, no tech overwhelm.' },
+      { title:'Instant Access to Everything You Need', text:"The moment you sign up, you'll receive your login details and all bonuses so you can start immediately." },
+      { title:'Up and Running Fast', text:'Go from signup to building your business in just minutes, no complicated setup required. Best of all is that we guide you every step of the way!' },
+      { title:'Flexible & Risk-Free', text:"You're always in control, cancel or adjust anytime if it's not the right fit." },
+    ];
+
+    const rows = [
+      { feature:'CRM & PIPELINE MANAGEMENT', price:'$99/MONTHLY' },
+      { feature:'UNLIMITED SALES FUNNELS', price:'$297/MONTHLY' },
+      { feature:'WEBSITE BUILDER', price:'$29/MONTHLY' },
+      { feature:'SURVEYS & FORMS', price:'$49/MONTHLY' },
+      { feature:'EMAIL MARKETING', price:'$99/MONTHLY' },
+      { feature:'2-WAY SMS MARKETING', price:'$99/MONTHLY' },
+      { feature:'BOOKING & APPOINTMENTS', price:'$29/MONTHLY' },
+      { feature:'WORKFLOW AUTOMATIONS', price:'$169/MONTHLY' },
+      { feature:'COURSES/PRODUCTS', price:'$159/MONTHLY' },
+      { feature:'CALL TRACKING', price:'$95/MONTHLY' },
+      { feature:'REPUTATION MANAGEMENT', price:'$299/MONTHLY' },
+      { feature:'TRACKING & ANALYTICS', price:'$49/MONTHLY' },
+    ];
+
+    const testimonials = [
+      { initial:'J', role:'Jordan M. · Tampa, FL', quote:'I had zero tech background. I followed the system, built a demo for a local landscaper, and closed him at $350/mo in my second week. Three clients now.' },
+      { initial:'P', role:'Priya R. · Austin, TX', quote:"The kickoff call alone was worth it. Cassey's team helped me pick a niche and write my outreach message. First paying client in 11 days." },
+      { initial:'M', role:'Marcus D. · Columbus, OH', quote:"I'd bought other programs and never finished them. The difference here is the system actually tells you what to do next. I'm at $1,400/mo recurring." },
+      { initial:'A', role:'Alana T. · Phoenix, AZ', quote:'The AI builds the whole demo in minutes, so prospects can see it before they pay. That changed everything. My close rate went way up.' },
+    ];
+
+    const faqData = [
+      { q:"I'm not techy. Will this work for me?", a:'Yes. If you can type a sentence into a chat box, you can use this. The AI handles the coding, design, and technical setup.' },
+      { q:"I don't know anything about AI.", a:"You don't need to. Our platform has the AI built-in. You don't need to write complex prompts or understand how language models work." },
+      { q:'This seems too good to be true.', a:"It's not magic, it's just leverage. AI has simply made it faster to create digital assets. Businesses still need these assets, and they are willing to pay someone to set it up for them." },
+      { q:"I've failed at other business models before.", a:"Most models require you to build a product, run ads, or learn complex skills first. This model is different because you don't build anything until you have a client interested." },
+    ];
+    const compareRows = [
+      { feature:'CRM & Pipeline Management', price:499 },
+      { feature:'Unlimited Sales Funnels', price:597 },
+      { feature:'Website & Page Builder', price:399 },
+      { feature:'Email Marketing', price:599 },
+      { feature:'2-Way SMS Marketing', price:499 },
+      { feature:'Booking & Appointments', price:199 },
+      { feature:'Workflow Automations', price:699 },
+      { feature:'Courses & Memberships', price:399 },
+      { feature:'Reputation Management', price:499 },
+      { feature:'Call Tracking & Analytics', price:399 },
+      { feature:'Surveys, Forms & Proposals', price:299 },
+      { feature:'AI Chatbot & Voice Assistant', price:1885 },
+    ].map(r => ({ feature: r.feature, price: '$' + r.price + '/mo' }));
+    const compareTotal = '$' + (6972).toLocaleString('en-US') + '/mo';
+
+    const stats = [
+      { value:'5,000+', label:'Agency owners building with VibeLabs' },
+      { value:'< 30 days', label:'Average time to a first paying client' },
+      { value:'4.9 / 5', label:'Member satisfaction across 1,200 reviews' },
+      { value:'$0', label:'Upfront ad spend needed to start' },
+    ];
+
+    const caseStudies = [
+      { initial:'J', name:'Jordan M.', niche:'Landscaping & Lawn Care · Tampa, FL',
+        metric:'$1,050', metricLabel:'monthly recurring', sub:'3 clients in 6 weeks',
+        story:'Started with zero tech background. Built an AI demo for a local landscaper, closed him at $350/mo in week two, then repeated the exact same play twice more.' },
+      { initial:'P', name:'Priya R.', niche:'Med Spas & Salons · Austin, TX',
+        metric:'11 days', metricLabel:'to first client', sub:'$497/mo first deal',
+        story:'Used the kickoff call to pick a niche and write her outreach message. The AI-generated demo did the selling, and her first prospect signed before she finished the call.' },
+      { initial:'M', name:'Marcus D.', niche:'Home Services · Columbus, OH',
+        metric:'$1,400', metricLabel:'monthly recurring', sub:'4 clients, ~9 hrs/wk',
+        story:'Had bought programs before and never finished them. The difference was a system that tells you the next step, and he now runs the whole thing part-time around his day job.' },
+    ];
+
+    const videos = [
+      { name:'Jordan M.', role:'From zero tech skills to 3 clients', length:'4:12' },
+      { name:'Priya R.', role:'Closed her first client in 11 days', length:'3:05' },
+      { name:'Marcus D.', role:'$1,400/mo recurring, part-time', length:'5:38' },
+    ];
+
+    const integrations = [
+      'Stripe','Google Calendar','Twilio','Mailgun','Facebook','Instagram',
+      'WordPress','Shopify','Zapier','QuickBooks','Zoom','Slack',
+    ];
+
+    const faqs = faqData.map((f, i) => ({
+      q: f.q, a: f.a, open: this.state.openFaq === i,
+      toggle: () => this.setState(s => ({ openFaq: s.openFaq === i ? -1 : i })),
+    }));
+
+    return {
+      days:this.state.days, hrs:this.state.hrs, min:this.state.min, sec:this.state.sec,
+      clients, price,
+      priceLabel: fmt(price),
+      monthly: fmt(monthly),
+      yearly: fmt(monthly * 12),
+      clientsBg: bar(cPct),
+      priceBg: bar(pPct),
+      setClients: e => this.setState({ clients: +e.target.value }),
+      setPrice: e => this.setState({ price: +e.target.value }),
+      perks, riskFree, getStarted, rows, testimonials, faqs,
+      compareRows, compareTotal, stats, caseStudies, videos, integrations,
+      clientsTo5k,
+      builderPrice: '$' + planPrice(297),
+      agencyPrice: '$' + planPrice(497),
+      wlPrice: '$' + planPrice(997),
+      billingNote: isAnnual ? 'billed annually · 2 months free' : 'billed monthly',
+      monthlyBtnStyle: { ...tBase, ...(isAnnual ? tOff : tOn) },
+      annualBtnStyle: { ...tBase, ...(isAnnual ? tOn : tOff) },
+      setMonthly: () => this.setState({ billing:'monthly' }),
+      setAnnual: () => this.setState({ billing:'annual' }),
+
+      pillShow: '0', // retired in favor of the Ava concierge launcher
+      barVisible,
+      toastBottom: barVisible ? '92px' : '24px',
+      toast: this.state.toast || {},
+      toastVisible: !!this.state.toast,
+      kitItems: this.kitItems,
+      kitOpen: this.state.kitOpen,
+      kitSent: this.state.kitSent,
+      kitNotSent: !this.state.kitSent,
+      kitEmail: this.state.kitEmail,
+      kitErr: this.state.kitErr,
+      setKitEmail: e => this.setState({ kitEmail: e.target.value }),
+      submitKit: e => this.submitKit(e),
+      closeKit: () => this.setState({ kitOpen:false, kitDismissed:true }),
+      dismissBar: () => this.setState({ barDismissed:true }),
+      stop: e => e.stopPropagation(),
+      startKitTrial: () => {
+        this.setState({ kitOpen:false });
+        window.location.hash = 'contact';
+        setTimeout(() => { const m = document.querySelector('#contact textarea'); if (m) m.focus({ preventScroll:true }); }, 700);
+      },
+
+      name: this.state.name,
+      email: this.state.email,
+      message: this.state.message,
+      error: this.state.error,
+      sent: this.state.sent,
+      notSent: !this.state.sent,
+      setName: e => this.setState({ name: e.target.value }),
+      setEmail: e => this.setState({ email: e.target.value }),
+      setMessage: e => this.setState({ message: e.target.value }),
+      submit: e => this.submitContact(e),
+      startTrial: e => {
+        e.preventDefault();
+        // Hash navigation respects the page's scroll container (same as the other CTAs).
+        window.location.hash = 'contact';
+        setTimeout(() => {
+          const msg = document.querySelector('#contact textarea');
+          if (msg) msg.focus({ preventScroll: true });
+        }, 700);
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

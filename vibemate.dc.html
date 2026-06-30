@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#070a12;}
+  @keyframes avaRise{from{transform:translateY(8px);}to{transform:none;}}
+  @keyframes avaDot{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-5px);opacity:1;}}
+  @keyframes avaPanel{from{opacity:0;transform:translateY(22px) scale(.98);}to{opacity:1;transform:none;}}
+  @keyframes avaPulse{0%{box-shadow:0 0 0 0 rgba(47,107,255,.55);}70%{box-shadow:0 0 0 18px rgba(47,107,255,0);}100%{box-shadow:0 0 0 0 rgba(47,107,255,0);}}
+  .ava-bub{animation:avaRise .35s ease both;}
+  .ava-scroll::-webkit-scrollbar{width:7px;}
+  .ava-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:9px;}
+</style>
+</helmet>
+<div style="font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+
+  <!-- ===== Launcher (minimized) ===== -->
+  <sc-if value="{{ closed }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;right:24px;bottom:24px;z-index:2147483000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+      <sc-if value="{{ showTeaser }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;max-width:258px;background:#141d33;border:1px solid rgba(255,255,255,.1);border-radius:16px 16px 4px 16px;padding:14px 30px 14px 16px;box-shadow:0 18px 44px rgba(0,0,0,.5);">
+          <button onClick="{{ dismissTeaser }}" aria-label="Dismiss" style="position:absolute;top:6px;right:9px;background:transparent;border:none;color:#7f8db0;font-size:17px;line-height:1;cursor:pointer;">×</button>
+          <div style="font-size:14px;color:#e7ecf5;line-height:1.45;">👋 Want a free AI agency plan? I'll map it out in about 60 seconds.</div>
+        </div>
+      </sc-if>
+      <button onClick="{{ toggleOpen }}" style="display:inline-flex;align-items:center;gap:12px;background:linear-gradient(90deg,#2f6bff,#1d4fd6);border:none;color:#fff;padding:14px 22px 14px 14px;border-radius:999px;cursor:pointer;font-family:inherit;box-shadow:0 18px 44px rgba(47,107,255,.45);animation:avaPulse 2.4s infinite;">
+        <span style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.7 5L19 8.6l-5.3 1.6L12 16l-1.7-5.8L5 8.6 10.3 7z"></path></svg></span>
+        <span style="text-align:left;"><span style="display:block;font-size:16px;font-weight:800;">Chat with VibeMate</span><span style="display:block;font-size:12.5px;opacity:.85;">Get your free AI agency plan</span></span>
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- ===== Chat panel ===== -->
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed;right:24px;bottom:24px;z-index:2147483000;width:min(420px,calc(100vw - 48px));height:min(740px,calc(100vh - 48px));background:#0b1120;border:1px solid rgba(255,255,255,.08);border-radius:24px;box-shadow:0 50px 120px rgba(0,0,0,.65);display:flex;flex-direction:column;overflow:hidden;">
+
+      <!-- header -->
+      <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;background:linear-gradient(90deg,#15233f,#0e1830);border-bottom:1px solid rgba(255,255,255,.07);flex:none;">
+        <div style="position:relative;flex:none;width:44px;height:44px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3b73ff,#1d4fd6);display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.7 5L19 8.6l-5.3 1.6L12 16l-1.7-5.8L5 8.6 10.3 7z"></path></svg></div>
+          <span style="position:absolute;right:0;bottom:1px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #15233f;"></span>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:16.5px;font-weight:800;color:#fff;letter-spacing:-.01em;">{{ botName }}</div>
+          <div style="font-size:12.5px;color:#7fd99b;display:flex;align-items:center;gap:5px;">Online now · AI Strategist</div>
+        </div>
+        <button onClick="{{ toggleOpen }}" aria-label="Minimize" style="flex:none;background:rgba(255,255,255,.08);border:none;color:#cdd6e6;width:32px;height:32px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+      </div>
+
+      <!-- progress -->
+      <div style="height:3px;background:rgba(255,255,255,.06);flex:none;"><div style="height:100%;background:linear-gradient(90deg,#3b73ff,#6f97ff);width: {{ progressPct }};transition:width .5s cubic-bezier(.2,.7,.2,1);"></div></div>
+
+      <!-- messages -->
+      <div ref="{{ setMsgRef }}" class="ava-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 16px 8px;background:#0b1120;">
+        <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+          <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}">
+            <div class="ava-bub" style="display:flex;gap:9px;align-items:flex-end;margin-bottom:13px;">
+              <div style="flex:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b73ff,#1d4fd6);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.6 4.8L18 8l-4.4 1.2L12 14l-1.6-4.8L6 8l4.4-1.2z"></path></svg></div>
+              <div style="background:#141d33;color:#e7ecf5;border-radius:15px 15px 15px 4px;padding:10px 14px;max-width:82%;font-size:14.5px;line-height:1.46;">{{ m.text }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+            <div class="ava-bub" style="display:flex;justify-content:flex-end;margin-bottom:13px;">
+              <div style="background:#2f6bff;color:#fff;border-radius:15px 15px 4px 15px;padding:10px 14px;max-width:82%;font-size:14.5px;line-height:1.46;">{{ m.text }}</div>
+            </div>
+          </sc-if>
+        </sc-for>
+        <sc-if value="{{ isTyping }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:9px;align-items:flex-end;margin-bottom:13px;">
+            <div style="flex:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b73ff,#1d4fd6);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.6 4.8L18 8l-4.4 1.2L12 14l-1.6-4.8L6 8l4.4-1.2z"></path></svg></div>
+            <div style="background:#141d33;border-radius:15px 15px 15px 4px;padding:13px 16px;display:flex;gap:5px;">
+              <span style="width:7px;height:7px;border-radius:50%;background:#7f8db0;animation:avaDot 1s infinite;"></span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#7f8db0;animation:avaDot 1s infinite .15s;"></span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#7f8db0;animation:avaDot 1s infinite .3s;"></span>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- input / UI area -->
+      <div style="flex:none;padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);background:#0c1426;">
+        <sc-if value="{{ isChips }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <sc-for list="{{ options }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="background:rgba(47,107,255,.12);border:1px solid rgba(47,107,255,.45);color:#cddcff;font-size:14px;font-weight:600;font-family:inherit;padding:10px 16px;border-radius:999px;cursor:pointer;transition:all .15s;" style-hover="background:#2f6bff;color:#fff;border-color:#2f6bff;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isText }}" hint-placeholder-val="{{ false }}">
+          <form onSubmit="{{ submitText }}">
+            <sc-if value="{{ isErr }}" hint-placeholder-val="{{ false }}"><div style="color:#f0617a;font-size:13px;margin-bottom:8px;">{{ err }}</div></sc-if>
+            <div style="display:flex;gap:8px;">
+              <input type="{{ textType }}" inputmode="{{ textInputmode }}" placeholder="{{ textPlaceholder }}" value="{{ textVal }}" onChange="{{ setText }}" style="flex:1;background:#0a1020;border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:12px 15px;color:#fff;font-size:15px;font-family:inherit;outline:none;" />
+              <button type="submit" aria-label="Send" style="flex:none;width:46px;background:#2f6bff;border:none;color:#fff;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+            </div>
+          </form>
+        </sc-if>
+
+        <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-size:11.5px;color:#7f8db0;margin-bottom:8px;font-weight:700;letter-spacing:.08em;">CHOOSE A DAY</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="5">
+                <button onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ showTimes }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11.5px;color:#7f8db0;margin-bottom:8px;font-weight:700;letter-spacing:.08em;">PICK A TIME</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px;">
+                <sc-for list="{{ times }}" as="t" hint-placeholder-count="5">
+                  <button onClick="{{ t.onClick }}" style="background:rgba(47,107,255,.12);border:1px solid rgba(47,107,255,.45);color:#cddcff;font-size:14px;font-weight:600;font-family:inherit;padding:9px 15px;border-radius:10px;cursor:pointer;transition:all .15s;" style-hover="background:#2f6bff;color:#fff;border-color:#2f6bff;">{{ t.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isEnd }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#0f1830;border:1px solid rgba(47,107,255,.25);border-radius:14px;padding:15px 17px;">
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:11px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f97ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg><span style="font-size:15px;font-weight:700;color:#fff;">{{ lead.day }} at {{ lead.time }}</span></div>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:9px;color:#cdd6e6;font-size:14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7f8db0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>{{ lead.name }}</div>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:9px;color:#cdd6e6;font-size:14px;word-break:break-all;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7f8db0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>{{ lead.email }}</div>
+              <sc-if value="{{ hasPhone }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:center;color:#cdd6e6;font-size:14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7f8db0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"></path></svg>{{ lead.phone }}</div></sc-if>
+            </div>
+            <sc-if value="{{ hasCalendly }}" hint-placeholder-val="{{ false }}">
+              <a href="{{ calendlyUrl }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;background:#2f6bff;color:#fff;font-size:14.5px;font-weight:700;text-decoration:none;padding:12px;border-radius:12px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Confirm on our live calendar</a>
+            </sc-if>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button onClick="{{ downloadIcs }}" style="flex:1;background:#2f6bff;border:none;color:#fff;font-size:14.5px;font-weight:700;font-family:inherit;padding:12px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Add to calendar</button>
+              <button onClick="{{ restart }}" style="flex:none;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#cdd6e6;font-size:14.5px;font-weight:600;font-family:inherit;padding:12px 16px;border-radius:12px;cursor:pointer;">Start over</button>
+            </div>
+            <div style="font-size:12.5px;color:#7f8db0;margin-top:12px;line-height:1.5;">Your booking has been sent to our team, and {{ strategistName }} will personally call you at the time you picked. Mail app didn't open? <a onClick="{{ resend }}" style="color:#7da0ff;text-decoration:none;cursor:pointer;">Tap to resend</a>.</div>
+          </div>
+        </sc-if>
+
+        <div style="margin-top:11px;font-size:11.5px;color:#566179;display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#566179" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>Private &amp; secure. No spam, ever.</div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:788},&quot;botName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;VibeMate&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;strategistName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sarah&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;collectPhone&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;leadEmail&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;hello@vibelabsagency.com&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;calendlyUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { open:false, messages:[], uiType:'typing', options:[],
+            textVal:'', err:'', selDay:null, idx:0, teaserOn:false, teaserDismissed:false };
+
+  componentDidMount() {
+    this.botName = this.props.botName ?? 'VibeMate';
+    this.strategistName = this.props.strategistName ?? 'Sarah';
+    this.collectPhone = this.props.collectPhone ?? true;
+    this.leadEmail = this.props.leadEmail ?? 'hello@vibelabsagency.com';
+    this.calendlyUrl = this.props.calendlyUrl ?? '';
+    this._teaserT = setTimeout(() => {
+      if (!this.state.open && !this.state.teaserDismissed) this.setState({ teaserOn: true });
+    }, 7000);
+    this.lead = {};
+    this.pad = n => String(n).padStart(2,'0');
+    this.times = ['9:00 AM','11:30 AM','1:00 PM','3:30 PM','5:00 PM'];
+    this.timeStarts = { '9:00 AM':'090000','11:30 AM':'113000','1:00 PM':'130000','3:30 PM':'153000','5:00 PM':'170000' };
+    this.days = this.buildDays();
+    this.flow = this.buildFlow();
+    this.enterStep(0);
+  }
+  componentWillUnmount() {
+    if (this._t) clearTimeout(this._t);
+    if (this._teaserT) clearTimeout(this._teaserT);
+  }
+  componentDidUpdate() {
+    if (this.msgEl) this.msgEl.scrollTop = this.msgEl.scrollHeight;
+  }
+
+  buildDays() {
+    const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const out = []; const d = new Date(); d.setDate(d.getDate() + 1);
+    while (out.length < 5) {
+      const w = d.getDay();
+      if (w !== 0 && w !== 6) out.push({ label: wd[w] + ' ' + mo[d.getMonth()] + ' ' + d.getDate(), iso: '' + d.getFullYear() + this.pad(d.getMonth()+1) + this.pad(d.getDate()) });
+      d.setDate(d.getDate() + 1);
+    }
+    return out;
+  }
+
+  buildFlow() {
+    const A = this.strategistName;
+    const flow = [
+      { bot:["Hey there! I'm " + this.botName + ", the AI strategist here at VibeLabs. \uD83D\uDC4B","Give me 60 seconds and I'll map out how you could launch your own AI agency, then book you a free strategy call. Ready?"],
+        ui:{ type:'chips', options:[
+          { label:"Yes, let's go \uD83D\uDE80", val:'yes' },
+          { label:"I've got questions", val:'q', reply:"Love it. The fastest way to get every answer is a quick call, so let's get you there. \uD83D\uDC47" },
+        ]}},
+      { field:'situation', bot:["First, where are you starting from?"],
+        ui:{ type:'chips', options:[
+          { label:"Total beginner", val:'a complete beginner', reply:"Perfect. Some of our best agency owners started right there, the system does the heavy lifting." },
+          { label:"I own a business", val:'a business owner', reply:"Great, you'll add AI as a brand-new revenue line without the tech headaches." },
+          { label:"I run an agency", val:'an agency owner', reply:"Awesome, let's plug AI in and scale what's already working." },
+        ]}},
+      { field:'niche', bot:["Which local niche are you most fired up to serve?"],
+        ui:{ type:'chips', options:[
+          { label:"Home services", val:'home services', reply:"Smart pick. Plumbers, HVAC and roofers pay well and always need leads." },
+          { label:"Med spas & salons", val:'med spas & salons', reply:"Great choice, high-ticket and booking-driven, perfect for AI." },
+          { label:"Restaurants", val:'restaurants', reply:"Nice, reservations and reviews on autopilot is an easy sell." },
+          { label:"Real estate", val:'real estate', reply:"Strong niche, agents will pay for more booked showings." },
+          { label:"Not sure yet", val:'your ideal niche', reply:"No problem at all, we'll pick a winner together on your call." },
+        ]}},
+      { field:'goal', bot:["And what would make this a win in the next 90 days?"],
+        ui:{ type:'chips', options:[
+          { label:"$1 to 3k/mo on the side", val:'a $1-3k/mo side income', reply:"Totally doable, that's often just 2 to 4 local clients." },
+          { label:"Replace my 9 to 5", val:'replacing your 9-5 income', reply:"Big goal, I love it, and the recurring model is built for exactly that." },
+          { label:"Scale past $10k/mo", val:'scaling past $10k/mo', reply:"Let's go, white-label is your fastest lever there." },
+        ]}},
+      { bot:["Awesome, I can already see a clear path for you. \uD83C\uDFAF","Let's lock in your free strategy call. What's your first name?"],
+        reply:"Great to meet you, {name}! \uD83D\uDE4C",
+        ui:{ type:'text', field:'name', kind:'text', placeholder:'Your first name' }},
+      { bot:["Where should I send your call invite and the free AI Agency Starter Kit, {name}?"],
+        ui:{ type:'text', field:'email', kind:'email', placeholder:'you@email.com' }},
+      { bot:["Perfect. And the best number for your strategist to reach you on?"],
+        ui:{ type:'text', field:'phone', kind:'tel', placeholder:'(555) 123-4567' }},
+      { bot:["Almost there. Here's my live calendar, grab the time that suits you best:"],
+        ui:{ type:'calendar' }},
+      { bot:["\uD83C\uDF89 You're all set, {name}!","Your free strategy call is locked in for {day} at {time}. A confirmation is on its way to {email}.",
+             A + ", one of our senior strategists, will personally call you then with your {niche} game plan ready to go.","Talk soon, you've got this. \uD83D\uDCAA"],
+        ui:{ type:'end' }},
+    ];
+    if (!this.collectPhone) flow.splice(6, 1);
+    return flow;
+  }
+
+  fill(t) {
+    const L = this.lead;
+    return (t || '')
+      .replace(/\{name\}/g, L.name || 'there')
+      .replace(/\{email\}/g, L.email || 'your inbox')
+      .replace(/\{niche\}/g, L.niche || 'your niche')
+      .replace(/\{goal\}/g, L.goal || 'your goal')
+      .replace(/\{day\}/g, L.day || '')
+      .replace(/\{time\}/g, L.time || '');
+  }
+
+  curStep() { return this.flow[this.state.idx]; }
+
+  enterStep(i) {
+    this.setState({ idx: i, uiType: 'typing', options: [], selDay: null, err: '' });
+    const step = this.flow[i];
+    let lines = (step.bot || []).slice();
+    if (this._pending) { lines = [this._pending].concat(lines); this._pending = null; }
+    this.pushBotLines(lines.map(t => this.fill(t)), () => this.showUI(step));
+  }
+
+  pushBotLines(lines, done) {
+    if (!lines.length) { done && done(); return; }
+    const first = lines[0], rest = lines.slice(1);
+    this.setState({ uiType: 'typing' });
+    const delay = 550 + Math.min(first.length * 11, 850);
+    this._t = setTimeout(() => {
+      this.setState(s => ({ messages: s.messages.concat([{ from:'bot', text:first }]) }));
+      if (rest.length) this._t = setTimeout(() => this.pushBotLines(rest, done), 300);
+      else done && done();
+    }, delay);
+  }
+
+  showUI(step) {
+    const u = step.ui;
+    if (u.type === 'chips') this.setState({ uiType:'chips', options: u.options });
+    else if (u.type === 'text') this.setState({ uiType:'text', options: [], textVal:'' });
+    else if (u.type === 'calendar') this.setState({ uiType:'calendar' });
+    else if (u.type === 'end') this.setState({ uiType:'end' });
+  }
+
+  pushUser(text) { this.setState(s => ({ messages: s.messages.concat([{ from:'user', text }]) })); }
+
+  choose(o) {
+    const step = this.curStep();
+    this.pushUser(o.label);
+    if (step.field) this.lead[step.field] = o.val;
+    if (o.reply) this._pending = o.reply;
+    this.enterStep(this.state.idx + 1);
+  }
+
+  submitText(e) {
+    e && e.preventDefault();
+    const step = this.curStep(), cfg = step.ui, v = (this.state.textVal || '').trim();
+    if (cfg.kind === 'text' && v.length < 2) return this.setState({ err:'Please enter your name so I know what to call you.' });
+    if (cfg.kind === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return this.setState({ err:'That email looks off, mind double-checking?' });
+    if (cfg.kind === 'tel' && v.replace(/\D/g,'').length < 7) return this.setState({ err:'Please enter a number we can reach you on.' });
+    this.lead[cfg.field] = v;
+    this.pushUser(v);
+    if (step.reply) this._pending = step.reply;
+    this.setState({ textVal:'', err:'' });
+    this.enterStep(this.state.idx + 1);
+  }
+
+  pickDay(d) { this.setState({ selDay: d }); }
+  pickTime(t) {
+    const d = this.state.selDay;
+    this.lead.day = d.label; this.lead.time = t;
+    this._iso = d.iso;
+    this.pushUser(d.label + ' at ' + t);
+    this.deliverLead();
+    this.enterStep(this.state.idx + 1);
+  }
+
+  deliverLead() {
+    const L = this.lead;
+    const to = this.leadEmail || 'simpleonlinesteps1@gmail.com';
+    const subj = 'New strategy call booking: ' + (L.name || '') + ' (' + (L.niche || '') + ')';
+    const body = [
+      'New free strategy call booked through the VibeLabs website concierge.',
+      '',
+      'Name: ' + (L.name || ''),
+      'Email: ' + (L.email || ''),
+      'Phone: ' + (L.phone || 'not provided'),
+      'Starting point: ' + (L.situation || ''),
+      'Niche: ' + (L.niche || ''),
+      '90-day goal: ' + (L.goal || ''),
+      'Requested call: ' + (L.day || '') + ' at ' + (L.time || ''),
+      '',
+      'Please confirm the booking and add it to the calendar.'
+    ].join('\n');
+    const href = 'mailto:' + to + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+    try {
+      const a = document.createElement('a');
+      a.href = href; a.style.display = 'none';
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) {}
+  }
+
+  downloadIcs() {
+    const start = this.timeStarts[this.lead.time] || '090000';
+    let h = +start.slice(0,2), m = +start.slice(2,4);
+    m += 30; if (m >= 60) { m -= 60; h += 1; }
+    const end = this.pad(h) + this.pad(m) + '00';
+    const dt = this._iso + 'T';
+    const ics = [
+      'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//VibeLabs//Ava//EN','BEGIN:VEVENT',
+      'UID:' + Date.now() + '@vibelabsagency.com',
+      'SUMMARY:VibeLabs Free Strategy Call',
+      'DTSTART:' + dt + start, 'DTEND:' + dt + end,
+      'DESCRIPTION:Your free 1-on-1 AI agency strategy call with ' + this.strategistName + '. Niche: ' + (this.lead.niche || '') + '.',
+      'LOCATION:Phone call', 'END:VEVENT','END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], { type:'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'vibelabs-strategy-call.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  restart() {
+    if (this._t) clearTimeout(this._t);
+    this.lead = {}; this._pending = null;
+    this.setState({ messages:[], options:[], textVal:'', err:'', selDay:null, idx:0 });
+    this.enterStep(0);
+  }
+
+  renderVals() {
+    const u = this.state.uiType;
+    const last = this.flow ? this.flow.length - 1 : 8;
+    const dayStyleBase = 'border-radius:10px;font-size:13.5px;font-weight:600;font-family:inherit;padding:9px 13px;cursor:pointer;transition:all .15s;';
+    return {
+      botName: this.botName || 'VibeMate',
+      strategistName: this.strategistName || 'Sarah',
+      open: this.state.open,
+      closed: !this.state.open,
+      toggleOpen: () => this.setState(s => ({ open: !s.open, teaserOn: false })),
+      showTeaser: this.state.teaserOn && !this.state.open && !this.state.teaserDismissed,
+      dismissTeaser: () => this.setState({ teaserOn: false, teaserDismissed: true }),
+      progressPct: Math.round((this.state.idx / last) * 100) + '%',
+
+      messages: this.state.messages.map(m => ({ text:m.text, isBot:m.from==='bot', isUser:m.from==='user' })),
+      isTyping: u === 'typing',
+
+      isChips: u === 'chips',
+      options: (this.state.options || []).map(o => ({ label:o.label, onClick: () => this.choose(o) })),
+
+      isText: u === 'text',
+      isErr: !!this.state.err,
+      err: this.state.err,
+      textVal: this.state.textVal,
+      textType: u === 'text' ? (this.curStep().ui.kind) : 'text',
+      textInputmode: u === 'text' ? ({ text:'text', email:'email', tel:'tel' }[this.curStep().ui.kind]) : 'text',
+      textPlaceholder: u === 'text' ? this.curStep().ui.placeholder : '',
+      setText: e => this.setState({ textVal: e.target.value }),
+      submitText: e => this.submitText(e),
+
+      isCalendar: u === 'calendar',
+      days: (this.days || []).map(d => ({
+        label: d.label,
+        onClick: () => this.pickDay(d),
+        style: dayStyleBase + (this.state.selDay && this.state.selDay.label === d.label
+          ? 'background:#2f6bff;color:#fff;border:1px solid #2f6bff;'
+          : 'background:rgba(47,107,255,.10);color:#cddcff;border:1px solid rgba(47,107,255,.4);')
+      })),
+      showTimes: u === 'calendar' && !!this.state.selDay,
+      times: (this.times || []).map(t => ({ label:t, onClick: () => this.pickTime(t) })),
+
+      isEnd: u === 'end',
+      lead: this.lead || {},
+      hasPhone: !!(this.lead && this.lead.phone),
+      hasCalendly: !!(this.calendlyUrl),
+      calendlyUrl: this.calendlyUrl || '',
+      downloadIcs: () => this.downloadIcs(),
+      resend: () => this.deliverLead(),
+      restart: () => this.restart(),
+
+      setMsgRef: el => { if (el) this.msgEl = el; },
+    };
+  }
+}
+</script>
+</body>
+</html>
