@@ -15,7 +15,6 @@ Static HTML, no build step, deployed by **Vercel on every push to `main`**.
 | `privacy.html`, `terms.html`, `earnings.html` | Standalone legal pages, not touched by recent work. |
 | `assets/` | Images, favicons, `site.webmanifest`. |
 | `vercel.json` | Cache headers only — HTML/JS no-cache, `assets/` immutable 1yr. |
-| `founder.jpg` (repo root) | Leftover from before the relaunch, no longer referenced anywhere (page now uses `assets/founder-cassey.jpg`). Left in place — out of scope of the handoff that removed the old `assets/founder.jpg`. Safe to delete whenever, just hasn't been asked for. |
 
 ## Template conventions (`index.html`)
 
@@ -83,6 +82,10 @@ access with a waitlist, added `assets/founder-cassey.jpg` and
 `assets/ai-workspace.png`, removed `assets/founder.jpg` and
 `assets/hero-whitelabel.webp` (superseded). Removed placeholder
 testimonials/case studies/activity toasts per the handoff.
+
+**2026-08-31 — Removed unused root `founder.jpg`**
+Leftover from before the relaunch, superseded by `assets/founder-cassey.jpg`
+and unreferenced anywhere in the repo. Deleted at the site owner's request.
 
 **2026-08-31 — Favicon fallback set** (`4b1bb73`)
 The site only had `assets/favicon.svg` (no fallback for browsers/devices
