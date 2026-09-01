@@ -73,15 +73,37 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
 - **No testimonials is a deliberate choice.** The "No wall of testimonials
   yet." section argues that being early is the advantage — don't re-add
   placeholder quotes.
-- **Annual-toggle discount intentionally compounds on top of the founding
-  rate** (annual Builder shows $81/mo). Confirmed by the site owner
-  2026-09-01 — this is not a bug, don't "fix" it to apply the annual
-  discount to the regular price instead.
-- **"7 days to a live branded agency" / "< 30 days"** claims on the page
-  are confirmed accurate by the site owner (2026-09-01) — safe to reuse
-  elsewhere (partner marketing copy, etc.) without re-flagging.
+- **Annual billing does NOT discount the founding rate.** `planPrice()` in
+  `index.html` is an identity function — annual and monthly show the same
+  $/mo for every tier. This was a deliberate reversal by the site owner
+  (2026-09-01): the toggle used to apply an extra ~17% off on top of the
+  already-discounted founding price (annual Builder showed $81/mo);
+  that compounding is gone. The "Annual · save 17%" button label was
+  removed along with it since it would now be false — don't re-add a
+  savings badge on the Annual button unless the pricing logic actually
+  gives one again.
+- **"7 days to a live branded agency"** (stats card) is confirmed accurate
+  by the site owner (2026-09-01) — safe to reuse elsewhere. There is **no
+  "< 30 days" claim anywhere on the current page** — that note (inherited
+  from the original design-handoff doc) never matched real page text, and
+  the site owner has since said 30 days would be inaccurate. Don't add a
+  30-day claim anywhere on the site.
 
 ## Work log
+
+**2026-09-01 — Removed annual-pricing compounding; corrected the 7/30-day note**
+Site owner reversed the earlier "keep it" decision on annual pricing:
+`planPrice()` changed from `b => isAnnual ? Math.round(b * 10 / 12) : b`
+to a flat identity function, so annual billing no longer discounts below
+the founding rate (annual Builder was $81/mo, now $97/mo — same as
+monthly). Removed the now-false "· save 17%" badge from the Annual toggle
+button; `billingNote` text was already accurate (just says "billed
+annually/monthly", no savings claim) so left as-is. Separately: re-checked
+for the "< 30 days" claim CLAUDE.md had flagged — it doesn't exist
+anywhere on the current page (never did, as far as this session found),
+so nothing to remove from `index.html`; corrected the note above so it's
+not misread as still-pending later. "7 days" (stats card) stays, confirmed
+accurate.
 
 **2026-09-01 — Closed out two audit items, no code change**
 Asked the site owner directly about the two "open decision" items from the

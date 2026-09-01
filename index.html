@@ -496,7 +496,7 @@
       <div style="display:flex;justify-content:center;margin-bottom:40px;">
         <div style="display:inline-flex;align-items:center;gap:4px;padding:5px;border-radius:999px;background:#0d1426;border:1px solid rgba(255,255,255,.08);">
           <button type="button" onClick="{{ setMonthly }}" style="{{ monthlyBtnStyle }}">Monthly</button>
-          <button type="button" onClick="{{ setAnnual }}" style="{{ annualBtnStyle }}">Annual <span style="font-size:12px;opacity:.85;">· save 17%</span></button>
+          <button type="button" onClick="{{ setAnnual }}" style="{{ annualBtnStyle }}">Annual</button>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;align-items:stretch;">
@@ -821,7 +821,11 @@ class Component extends DCLogic {
     const clientsTo5k = Math.ceil(5000 / price);
 
     const isAnnual = this.state.billing === 'annual';
-    const planPrice = b => isAnnual ? Math.round(b * 10 / 12) : b;
+    // Annual billing no longer discounts on top of the founding rate — confirmed
+    // by the site owner 2026-09-01 (was compounding: an extra ~17% off an
+    // already-discounted founding price). Annual just changes billing cadence,
+    // not the price, so this is an identity function now, not a real discount.
+    const planPrice = b => b;
     const tBase = { padding:'10px 24px', borderRadius:'999px', border:'none', cursor:'pointer', fontSize:'15px', fontWeight:700, fontFamily:'inherit', transition:'all .15s' };
     const tOn = { background:'#2f6bff', color:'#fff' };
     const tOff = { background:'transparent', color:'#9aa6bd' };
