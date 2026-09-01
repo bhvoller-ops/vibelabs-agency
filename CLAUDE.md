@@ -12,7 +12,7 @@ Static HTML, no build step, deployed by **Vercel on every push to `main`**.
 | `support.js` | Template runtime — expands `{{ }}` holes, `<sc-for>`/`<sc-if>`, and moves the `<helmet>` block's contents into the real `<head>` at runtime. |
 | `image-slot.js` | Image-slot handling used by `support.js`. |
 | `vibemate.dc.html` | Separate design-canvas artboard file, not part of the live page. |
-| `privacy.html`, `terms.html`, `earnings.html` | Standalone legal pages, not touched by recent work. |
+| `privacy.html`, `terms.html`, `earnings.html` | Standalone legal pages. Each has its own `<title>`/description/canonical now, but no OG/Twitter cards — not worth it for pages that aren't meant to be shared standalone. |
 | `assets/` | Images, favicons, `site.webmanifest`. |
 | `vercel.json` | Cache headers only — HTML/JS no-cache, `assets/` immutable 1yr. |
 
@@ -28,6 +28,12 @@ Static HTML, no build step, deployed by **Vercel on every push to `main`**.
   as word spacing. Wrap the whole sentence in one `<span>`.
 - Favicon/meta tags live in `<helmet>` (inside `<x-dc>`), not the literal
   `<head>` — `support.js` moves them at runtime.
+- **Exception: `<title>`, meta description, canonical, Open Graph, and
+  Twitter Card tags stay in the literal `<head>`, not `<helmet>`.** Share
+  crawlers (Slack, iMessage, Facebook, LinkedIn, Twitter) fetch raw HTML and
+  don't run JavaScript, so anything `support.js` only injects at runtime is
+  invisible to them. Same file, same page — just don't move these four tag
+  families into `<helmet>` even though favicon/`theme-color` live there.
 
 ## Design tokens
 
@@ -73,6 +79,24 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
   marketing copy), don't treat them as verified.
 
 ## Work log
+
+**2026-09-01 — Title, meta description, OG/Twitter cards, `lang` attribute**
+Full site audit turned up: no `<title>` anywhere on the site (all 4 pages),
+no meta description, no Open Graph/Twitter Card tags (link shares had no
+title/description/image), and no `lang` on `<html>`. Added `lang="en"` to
+all four pages. `index.html` got a full OG/Twitter card set — `og:image`
+points at `assets/ai-workspace.png` (its native 908×809). All of `<title>`,
+description, canonical, and the OG/Twitter tags are placed in the **literal
+`<head>`**, not `<helmet>` — see the exception noted in Template
+conventions above; share crawlers don't execute JS. The three legal pages
+got their own `<title>`/description/canonical only, no OG/Twitter (not
+meant to be shared standalone). Also
+surfaced but not fixed in this pass: `SPOTS_CLAIMED` still a placeholder,
+tracking pixels still pending real IDs, annual-toggle compounding still
+open, no `robots.txt`/`sitemap.xml`, `rows`/`compareRows`/`compareTotal`/
+`integrations` computed in `renderVals()` but unused in the template
+(dead code from a cut comparison-table section), and the two content
+images have no `loading="lazy"` or explicit width/height.
 
 **2026-09-01 — Fixed pricing "Get Early Access" buttons skipping the form**
 The three pricing-card CTAs (Builder / Agency / White-Label) linked to
