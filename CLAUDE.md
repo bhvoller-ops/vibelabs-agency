@@ -88,8 +88,44 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
   from the original design-handoff doc) never matched real page text, and
   the site owner has since said 30 days would be inaccurate. Don't add a
   30-day claim anywhere on the site.
+- **There is no personal "Meet the founder" section anymore** — no bio
+  paragraph, no first-person quote, no `assets/founder-cassey.jpg` on the
+  page. Removed deliberately (site owner confirmed, 2026-09-01), not a
+  bug. The section's perks list survived, relocated into "Why go first"
+  under "What every founding member gets," rewritten third-person ("me" →
+  "Cassey"). `assets/founder-cassey.jpg` is now unreferenced anywhere in
+  `index.html` — left in the repo, not deleted, since removing it wasn't
+  explicitly requested; ask before deleting it.
 
 ## Work log
+
+**2026-09-01 — Removed the founder bio section; reformatted footer legal text**
+Applied from a new `deploy/` bundle the site owner dropped
+(`Website update request/deploy/`), merged by hand onto the live repo
+state rather than copied wholesale — the bundle predated essentially all
+of this session's earlier work (no title/OG tags, no favicon fallback, no
+Google Sign-In, `#cta` anchors not yet fixed, annual pricing still
+compounding, dead renderVals fields still present, images not
+lazy/sized), including shipping the *pre-optimization* `ai-workspace.png`
+(689KB) in its `assets/`. None of that was reintroduced — only the two
+changes actually new in the bundle were taken:
+1. Deleted the "Meet the founder" section entirely (photo, bio, quote,
+   badge) — confirmed explicitly with the site owner first, since the
+   bundle also left `founder-cassey.jpg` sitting unused in `assets/`
+   without removing it, which read as a possible mistake rather than a
+   clean edit. Its perks list (Free Live Bootcamp / 1-on-1 Kickoff Call /
+   Weekly Live Calls / All Courses & Scripts / Private Community) moved
+   into the "Why go first" section under a new "What every founding
+   member gets" card, copy shifted from first- to third-person.
+2. Reformatted the four footer legal blocks (Independent Disclosure,
+   Earnings Disclaimer, Communication Consent, Business Opportunity
+   Statement) from paragraphs into a 4-card grid of bulleted lists —
+   same legal content, just restructured, nothing dropped.
+`github.md`/`CLAUDE.md` included in that bundle were not used as sources —
+they describe a different repo name (`Vibelabsagency/VibeLabs-Agency`)
+and reference files/history (`index.original.html`, `MarketingPage.dc.html`)
+that don't exist in this repo, so they read as notes from an unrelated,
+disconnected working copy rather than this one.
 
 **2026-09-01 — Removed annual-pricing compounding; corrected the 7/30-day note**
 Site owner reversed the earlier "keep it" decision on annual pricing:
