@@ -74,6 +74,17 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
 
 ## Work log
 
+**2026-09-01 — Waitlist CTA becomes a full lead capture form**
+Replaced `index.html` per an export from the site owner's Claude Design
+canvas. The `#contact` waitlist form went from a single email field to name /
+email / phone (optional) / "where you're starting from" (select) / a short
+free-text goal, with matching `submitContact` validation (name, email,
+profile required) and a richer `mailto:` body. Hero H1 gained a "White
+Label" line. Tightened the "Why go first" section's heading (was carrying a
+leftover "No wall of testimonials yet." title that didn't match its body
+copy). `startTrial` now focuses the new name field instead of the textarea
+on jump-to-contact. No asset or pricing/spots changes.
+
 **2026-08-31 — Early-access relaunch** (`1092c1f`)
 Replaced `index.html` per a design-handoff bundle: reworked hero, added
 "What You Walk Away With" / "This Is For You If" / "Your AI Workspace"
