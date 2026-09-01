@@ -306,7 +306,7 @@
       <h2 style="font-size:clamp(38px,5.4vw,60px);font-weight:800;letter-spacing:-.025em;margin:0;color:#fff;">Your AI Workspace</h2>
       <p style="max-width:900px;margin:20px auto 46px;font-size:20px;line-height:1.55;color:#8b97ad;text-wrap:pretty;">Your AI Employee helps you grow your business, be it a Medical Clinic, Legal Firm, or Home Services Company. It is under your brand, your logo, your domain, and your price.</p>
       <div style="max-width:908px;margin:0 auto;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.07);box-shadow:0 30px 80px rgba(0,0,0,.55);">
-        <img src="assets/ai-workspace.png" alt="Your AI Workspace: agency results across treatment centers and home services, with niche site examples" style="display:block;width:100%;height:auto;" />
+        <img src="assets/ai-workspace.png" alt="Your AI Workspace: agency results across treatment centers and home services, with niche site examples" width="908" height="809" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;" />
       </div>
     </div>
   </section>
@@ -417,7 +417,7 @@
   <section data-screen-label="Founder" style="padding:70px 24px;">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:60px;align-items:center;">
       <div style="position:relative;">
-        <img src="assets/founder-cassey.jpg" alt="Cassey Wallang, founder of VibeLabs Agency" style="display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:20px;" />
+        <img src="assets/founder-cassey.jpg" alt="Cassey Wallang, founder of VibeLabs Agency" width="768" height="1024" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:20px;" />
         <div style="position:absolute;bottom:18px;right:18px;background:#0b1120;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px 24px;max-width:300px;box-shadow:0 16px 40px rgba(0,0,0,.5);"><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;">20 Years in IT</div><div style="font-size:14px;line-height:1.45;color:#8b97ad;">Bridging complex technology and the people who use it.</div></div>
       </div>
       <div>
@@ -855,56 +855,17 @@ class Component extends DCLogic {
       { title:'Flexible & Risk-Free', text:"You're always in control, cancel or adjust anytime if it's not the right fit." },
     ];
 
-    const rows = [
-      { feature:'CRM & PIPELINE MANAGEMENT', price:'$99/MONTHLY' },
-      { feature:'UNLIMITED SALES FUNNELS', price:'$297/MONTHLY' },
-      { feature:'WEBSITE BUILDER', price:'$29/MONTHLY' },
-      { feature:'SURVEYS & FORMS', price:'$49/MONTHLY' },
-      { feature:'EMAIL MARKETING', price:'$99/MONTHLY' },
-      { feature:'2-WAY SMS MARKETING', price:'$99/MONTHLY' },
-      { feature:'BOOKING & APPOINTMENTS', price:'$29/MONTHLY' },
-      { feature:'WORKFLOW AUTOMATIONS', price:'$169/MONTHLY' },
-      { feature:'COURSES/PRODUCTS', price:'$159/MONTHLY' },
-      { feature:'CALL TRACKING', price:'$95/MONTHLY' },
-      { feature:'REPUTATION MANAGEMENT', price:'$299/MONTHLY' },
-      { feature:'TRACKING & ANALYTICS', price:'$49/MONTHLY' },
-    ];
-
-
     const faqData = [
       { q:"I'm not techy. Will this work for me?", a:'Yes. If you can type a sentence into a chat box, you can use this. The AI handles the coding, design, and technical setup.' },
       { q:"I don't know anything about AI.", a:"You don't need to. Our platform has the AI built-in. You don't need to write complex prompts or understand how language models work." },
       { q:'This seems too good to be true.', a:"It's not magic, it's just leverage. AI has simply made it faster to create digital assets. Businesses still need these assets, and they are willing to pay someone to set it up for them." },
       { q:"I've failed at other business models before.", a:"Most models require you to build a product, run ads, or learn complex skills first. This model is different because you don't build anything until you have a client interested." },
     ];
-    const compareRows = [
-      { feature:'CRM & Pipeline Management', price:499 },
-      { feature:'Unlimited Sales Funnels', price:597 },
-      { feature:'Website & Page Builder', price:399 },
-      { feature:'Email Marketing', price:599 },
-      { feature:'2-Way SMS Marketing', price:499 },
-      { feature:'Booking & Appointments', price:199 },
-      { feature:'Workflow Automations', price:699 },
-      { feature:'Courses & Memberships', price:399 },
-      { feature:'Reputation Management', price:499 },
-      { feature:'Call Tracking & Analytics', price:399 },
-      { feature:'Surveys, Forms & Proposals', price:299 },
-      { feature:'AI Chatbot & Voice Assistant', price:1885 },
-    ].map(r => ({ feature: r.feature, price: '$' + r.price + '/mo' }));
-    const compareTotal = '$' + (6972).toLocaleString('en-US') + '/mo';
-
     const stats = [
       { value:'100', label:'Founding member spots in this cohort' },
       { value:'7 days', label:'From joining to a live, branded agency' },
       { value:'20 years', label:'In IT and business systems, behind every step' },
       { value:'$0', label:'Upfront ad spend needed to start' },
-    ];
-
-
-
-    const integrations = [
-      'Stripe','Google Calendar','Twilio','Mailgun','Facebook','Instagram',
-      'WordPress','Shopify','Zapier','QuickBooks','Zoom','Slack',
     ];
 
     const faqs = faqData.map((f, i) => ({
@@ -925,8 +886,7 @@ class Component extends DCLogic {
       priceBg: bar(pPct),
       setClients: e => this.setState({ clients: +e.target.value }),
       setPrice: e => this.setState({ price: +e.target.value }),
-      perks, riskFree, getStarted, rows, faqs,
-      compareRows, compareTotal, stats, integrations,
+      perks, riskFree, getStarted, faqs, stats,
       clientsTo5k,
       builderPrice: '$' + planPrice(97),
       agencyPrice: '$' + planPrice(197),

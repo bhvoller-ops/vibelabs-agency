@@ -15,6 +15,7 @@ Static HTML, no build step, deployed by **Vercel on every push to `main`**.
 | `privacy.html`, `terms.html`, `earnings.html` | Standalone legal pages. Each has its own `<title>`/description/canonical now, but no OG/Twitter cards — not worth it for pages that aren't meant to be shared standalone. |
 | `assets/` | Images, favicons, `site.webmanifest`. |
 | `vercel.json` | Cache headers only — HTML/JS no-cache, `assets/` immutable 1yr. |
+| `robots.txt`, `sitemap.xml` | Standard crawler files, list all 4 pages. |
 
 ## Template conventions (`index.html`)
 
@@ -79,6 +80,34 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
   marketing copy), don't treat them as verified.
 
 ## Work log
+
+**2026-09-01 — robots.txt/sitemap.xml, dead-code cleanup, image perf**
+From the earlier audit's remaining low-priority items:
+- Added `robots.txt` (allow all, points at the sitemap) and `sitemap.xml`
+  (all 4 pages).
+- Removed `rows`, `compareRows`, `compareTotal`, `integrations` from
+  `renderVals()` — computed but never referenced anywhere in the template
+  (leftover from a comparison-table/integrations section that got cut
+  before this session ever touched the file). `stats`, `perks`, `riskFree`,
+  `getStarted`, `faqs` are all still live and unchanged.
+- `assets/ai-workspace.png` had a fully-opaque (i.e. entirely unused)
+  alpha channel — re-saved as RGB with PNG `optimize=True`, 689KB → 525KB
+  (24% smaller), zero visual change, same filename/format so nothing else
+  (including the `og:image` tag) needed updating. Verified dimensions
+  (908×809) and rendered output unchanged before committing.
+- Added `loading="lazy"`, `decoding="async"`, and explicit `width`/`height`
+  (908×809 and 768×1024, both images' native pixel dimensions) to the two
+  content `<img>` tags — both are below the fold. `width`/`height`
+  attributes give the browser the intrinsic aspect ratio to reserve layout
+  space even though CSS still controls the rendered size
+  (`width:100%;height:auto`), so this doesn't change how either image
+  displays.
+- **Not done, flagged as a further option**: converting `ai-workspace.png`
+  to WebP would save far more (~85% at quality 90 vs. the 24% lossless
+  win above) but changes the format the site owner supplied and needs a
+  compatibility call for `og:image` (WebP support in share-preview
+  crawlers is inconsistent) — a real decision, not a mechanical cleanup,
+  so left for the site owner to request explicitly.
 
 **2026-09-01 — Title, meta description, OG/Twitter cards, `lang` attribute**
 Full site audit turned up: no `<title>` anywhere on the site (all 4 pages),
