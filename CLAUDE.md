@@ -89,15 +89,21 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
   the site owner has since said 30 days would be inaccurate. Don't add a
   30-day claim anywhere on the site.
 - **There is no personal "Meet the founder" section anymore** — no bio
-  paragraph, no first-person quote, no `assets/founder-cassey.jpg` on the
-  page. Removed deliberately (site owner confirmed, 2026-09-01), not a
-  bug. The section's perks list survived, relocated into "Why go first"
-  under "What every founding member gets," rewritten third-person ("me" →
-  "Cassey"). `assets/founder-cassey.jpg` is now unreferenced anywhere in
-  `index.html` — left in the repo, not deleted, since removing it wasn't
-  explicitly requested; ask before deleting it.
+  paragraph, no first-person quote, no founder photo on the page. Removed
+  deliberately (site owner confirmed, 2026-09-01), not a bug. The
+  section's perks list survived, relocated into "Why go first" under
+  "What every founding member gets," rewritten third-person ("me" →
+  "Cassey"). `assets/founder-cassey.jpg` itself was deleted from the repo
+  the same day, site owner's explicit request, once confirmed nothing
+  referenced it.
 
 ## Work log
+
+**2026-09-01 — Deleted the unused founder-cassey.jpg**
+Site owner's explicit request, follow-up to the founder-section removal
+above. Re-checked first that nothing in the repo (`index.html`, legal
+pages, `support.js`/`image-slot.js`, `vibemate.dc.html`) still referenced
+it — clean, so removed via `git rm`.
 
 **2026-09-01 — Removed the founder bio section; reformatted footer legal text**
 Applied from a new `deploy/` bundle the site owner dropped
