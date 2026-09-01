@@ -73,13 +73,22 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
 - **No testimonials is a deliberate choice.** The "No wall of testimonials
   yet." section argues that being early is the advantage — don't re-add
   placeholder quotes.
-- **Annual-toggle discount compounds on top of the founding rate** (annual
-  Builder shows $81/mo). Known open decision, flagged not fixed.
-- **"7 days to a live branded agency" / "< 30 days"** style claims on the
-  page are unconfirmed — flag before repeating them elsewhere (e.g. partner
-  marketing copy), don't treat them as verified.
+- **Annual-toggle discount intentionally compounds on top of the founding
+  rate** (annual Builder shows $81/mo). Confirmed by the site owner
+  2026-09-01 — this is not a bug, don't "fix" it to apply the annual
+  discount to the regular price instead.
+- **"7 days to a live branded agency" / "< 30 days"** claims on the page
+  are confirmed accurate by the site owner (2026-09-01) — safe to reuse
+  elsewhere (partner marketing copy, etc.) without re-flagging.
 
 ## Work log
+
+**2026-09-01 — Closed out two audit items, no code change**
+Asked the site owner directly about the two "open decision" items from the
+audit: (1) annual-toggle discount compounding on the founding rate —
+confirmed intentional, keep as-is; (2) "7 days" / "<30 days" claims —
+confirmed accurate. Both moved from "flagged/unconfirmed" to "confirmed"
+in Things not to silently fix, above. No `index.html` changes.
 
 **2026-09-01 — robots.txt/sitemap.xml, dead-code cleanup, image perf**
 From the earlier audit's remaining low-priority items:
