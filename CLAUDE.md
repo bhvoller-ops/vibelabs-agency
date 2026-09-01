@@ -74,6 +74,15 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
 
 ## Work log
 
+**2026-09-01 — Fixed pricing "Get Early Access" buttons skipping the form**
+The three pricing-card CTAs (Builder / Agency / White-Label) linked to
+`#cta` (the Final CTA section) instead of `#contact` (the actual waitlist
+form) — a leftover from before the lead-capture form was rebuilt under
+`#contact`. Someone clicking from pricing landed on another sales section
+instead of the form. Changed all three to `href="#contact"`. The "process"
+section CTA (mid-page) still points at `#cta` intentionally, unchanged —
+only the pricing-card buttons were reported broken.
+
 **2026-09-01 — "Sign in with Google" on the waitlist form**
 Added Google Identity Services (`accounts.google.com/gsi/client`) to
 `<helmet>`, a rendered Google button above the `#contact` form, and
