@@ -74,6 +74,21 @@ Business Opportunity Rule disclaimer and must not be made to contradict it).
 
 ## Work log
 
+**2026-09-01 — "Sign in with Google" on the waitlist form**
+Added Google Identity Services (`accounts.google.com/gsi/client`) to
+`<helmet>`, a rendered Google button above the `#contact` form, and
+`initGoogleSignIn()`/`handleGoogleSignIn()` in the logic class. Signing in
+decodes the returned ID token client-side and prefills `name`/`email`; the
+person still fills phone/profile/goal and submits the same form, which still
+just opens the existing `mailto:` — no backend, no lead storage change.
+OAuth Client ID `1089729475643-pg65pgll41nk2al8ecs29cdkctjc9vl8
+.apps.googleusercontent.com` is registered by the site owner in their own
+Google Cloud project, with `https://www.vibelabsagency.com` and
+`https://vibelabsagency.com` as authorized JS origins (no redirect URI —
+this is the origins-only ID-token flow, not authorization code). If leads
+ever need to land somewhere other than the owner's inbox, that's a separate
+follow-up (needs a real destination — Sheet/CRM/webhook — decided first).
+
 **2026-09-01 — Waitlist CTA becomes a full lead capture form**
 Replaced `index.html` per an export from the site owner's Claude Design
 canvas. The `#contact` waitlist form went from a single email field to name /
