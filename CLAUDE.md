@@ -79,9 +79,11 @@ The three pricing-card CTAs (Builder / Agency / White-Label) linked to
 `#cta` (the Final CTA section) instead of `#contact` (the actual waitlist
 form) — a leftover from before the lead-capture form was rebuilt under
 `#contact`. Someone clicking from pricing landed on another sales section
-instead of the form. Changed all three to `href="#contact"`. The "process"
-section CTA (mid-page) still points at `#cta` intentionally, unchanged —
-only the pricing-card buttons were reported broken.
+instead of the form. Changed all three to `href="#contact"`. At the site
+owner's follow-up request, the "process" section CTA (mid-page) was changed
+the same way. No `href="#cta"` links remain on the page — the Final CTA
+section (`id="cta"`) is still there and still read in normal scroll order,
+it's just no longer a jump-link target.
 
 **2026-09-01 — "Sign in with Google" on the waitlist form**
 Added Google Identity Services (`accounts.google.com/gsi/client`) to
